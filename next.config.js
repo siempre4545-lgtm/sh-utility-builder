@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: 'src',
   experimental: {
     serverComponentsExternalPackages: ['sharp', 'pdf-lib', 'exceljs', 'archiver', 'unzipper'],
   },

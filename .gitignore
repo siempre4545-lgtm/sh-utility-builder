@@ -1,0 +1,17 @@
+# Node / Next
+node_modules/
+.next/
+out/
+dist/
+coverage/
+
+# Env & logs
+.env*
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

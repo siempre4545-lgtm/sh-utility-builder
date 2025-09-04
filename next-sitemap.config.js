@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || 'https://sh-utility-builder.vercel.app',
+  siteUrl: 'https://sh-utility-builder.vercel.app',
   generateRobotsTxt: true,
   generateIndexSitemap: false,
   exclude: ['/api/*', '/admin/*'],
@@ -73,7 +73,7 @@ module.exports = {
       },
     ],
     additionalSitemaps: [
-      `${process.env.SITE_URL || 'https://sh-utility-builder.vercel.app'}/sitemap.xml`,
+      'https://sh-utility-builder.vercel.app/sitemap.xml',
     ],
   },
   transform: async (config, path) => {

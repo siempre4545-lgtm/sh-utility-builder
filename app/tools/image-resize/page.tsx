@@ -6,6 +6,7 @@ import { Image, Download, Settings, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
+import Head from 'next/head'
 
 export default function ImageResizePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -35,6 +36,7 @@ export default function ImageResizePage() {
       formData.append('height', height.toString())
       formData.append('quality', quality.toString())
       formData.append('maintainAspectRatio', maintainAspectRatio.toString())
+      formData.append('isPro', 'false') // 무료 버전
 
       const response = await fetch('/api/image-resize', {
         method: 'POST',
@@ -43,10 +45,13 @@ export default function ImageResizePage() {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.error || '처리 중 오류가 발생했습니다.')
+        if (error.requiresPro) {
+          setIsProModalOpen(true)
+          return
+        }
+        throw new Error(error.error || '이미지 리사이즈 중 오류가 발생했습니다.')
       }
 
-      // 파일 다운로드
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -54,153 +59,128 @@ export default function ImageResizePage() {
       a.download = `resized_images_${Date.now()}.zip`
       document.body.appendChild(a)
       a.click()
-      window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-
+      window.URL.revokeObjectURL(url)
+      
       toast.success('이미지 리사이즈가 완료되었습니다!')
     } catch (error) {
-      console.error('처리 오류:', error)
-      toast.error(error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.')
+      console.error('이미지 리사이즈 오류:', error)
+      toast.error(error instanceof Error ? error.message : '이미지 리사이즈 중 오류가 발생했습니다.')
     } finally {
       setIsProcessing(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Image className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            이미지 리사이즈
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            JPEG, PNG, WebP 이미지 크기를 조정하고 품질을 최적화하세요. 
-            종횡비를 유지하면서 빠르고 안전하게 처리됩니다.
-          </p>
-        </div>
+    <>
+      <Head>
+        <title>무료 이미지 리사이즈 도구 - JPEG, PNG, WebP 크기 조정 | SH Tools</title>
+        <meta name="description" content="무료로 이미지 크기를 조정하세요. JPEG, PNG, WebP 파일의 해상도를 변경하고 품질을 최적화하는 온라인 도구. 종횡비 유지, 고품질 출력 지원." />
+        <meta name="keywords" content="이미지 리사이즈, 무료 이미지 크기 조정, JPEG 리사이즈, PNG 리사이즈, WebP 리사이즈, 온라인 이미지 편집, 이미지 최적화" />
+        <meta property="og:title" content="무료 이미지 리사이즈 도구 - JPEG, PNG, WebP 크기 조정" />
+        <meta property="og:description" content="무료로 이미지 크기를 조정하세요. JPEG, PNG, WebP 파일의 해상도를 변경하고 품질을 최적화하는 온라인 도구." />
+        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/image-resize" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="무료 이미지 리사이즈 도구" />
+        <meta name="twitter:description" content="무료로 이미지 크기를 조정하세요. JPEG, PNG, WebP 파일의 해상도를 변경하고 품질을 최적화하는 온라인 도구." />
+      </Head>
 
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Upload Area */}
-          <div className="lg:col-span-2">
-            <div className="card">
-              <FileUpload
-                onFilesSelected={handleFilesSelected}
-                acceptedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
-                maxSize={10}
-                maxFiles={10}
-                disabled={isProcessing}
-              />
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Image className="w-8 h-8 text-white" />
             </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              이미지 리사이즈
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              JPEG, PNG, WebP 이미지 크기를 조정하고 품질을 최적화하세요.
+              종횡비를 유지하면서 원하는 크기로 변경할 수 있습니다.
+            </p>
+          </div>
 
-            {/* Settings */}
-            <div className="card mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Settings className="w-5 h-5 mr-2" />
-                리사이즈 설정
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    너비 (픽셀)
-                  </label>
-                  <input 
-                    type="number" 
-                    className="input-field" 
-                    value={width}
-                    onChange={(e) => setWidth(parseInt(e.target.value) || 800)}
-                    placeholder="예: 800"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    높이 (픽셀)
-                  </label>
-                  <input 
-                    type="number" 
-                    className="input-field" 
-                    value={height}
-                    onChange={(e) => setHeight(parseInt(e.target.value) || 600)}
-                    placeholder="예: 600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    품질 (%) - {quality}
-                  </label>
-                  <input 
-                    type="range" 
-                    min="1" 
-                    max="100" 
-                    value={quality}
-                    onChange={(e) => setQuality(parseInt(e.target.value))}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-gray-500 mt-1">
-                    <span>낮음</span>
-                    <span>높음</span>
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Upload Area */}
+            <div className="lg:col-span-2">
+              <div className="card">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  이미지 업로드
+                </h3>
+                <FileUpload
+                  onFilesSelected={handleFilesSelected}
+                  acceptedTypes={['image/jpeg', 'image/png', 'image/webp']}
+                  maxSize={50}
+                  maxFiles={5}
+                  disabled={isProcessing}
+                />
+              </div>
+
+              {/* Settings */}
+              <div className="card mt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <Settings className="w-5 h-5 mr-2" />
+                  리사이즈 설정
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      너비 (픽셀)
+                    </label>
+                    <input
+                      type="number"
+                      value={width}
+                      onChange={(e) => setWidth(parseInt(e.target.value) || 800)}
+                      className="input-field"
+                      min="1"
+                      max="4000"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      높이 (픽셀)
+                    </label>
+                    <input
+                      type="number"
+                      value={height}
+                      onChange={(e) => setHeight(parseInt(e.target.value) || 600)}
+                      className="input-field"
+                      min="1"
+                      max="4000"
+                    />
                   </div>
                 </div>
-                <div>
+                <div className="mt-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    종횡비 유지
+                    품질 ({quality}%)
                   </label>
-                  <input 
-                    type="checkbox" 
-                    checked={maintainAspectRatio}
-                    onChange={(e) => setMaintainAspectRatio(e.target.checked)}
-                    className="w-4 h-4 text-primary-600 rounded"
+                  <input
+                    type="range"
+                    min="10"
+                    max="100"
+                    value={quality}
+                    onChange={(e) => setQuality(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                   />
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Features */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                주요 기능
-              </h3>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
-                  <span className="text-gray-600">JPEG, PNG, WebP 지원</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
-                  <span className="text-gray-600">품질 조절 (1-100%)</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
-                  <span className="text-gray-600">종횡비 자동 유지</span>
-                </li>
-                <li className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
-                  <span className="text-gray-600">빠른 처리 속도</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Download */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                다운로드
-              </h3>
-              <div className="text-center">
-                <Download className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-4">
-                  리사이즈된 이미지를 다운로드하세요
-                </p>
+                <div className="mt-4">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={maintainAspectRatio}
+                      onChange={(e) => setMaintainAspectRatio(e.target.checked)}
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">종횡비 유지</span>
+                  </label>
+                </div>
                 <Button 
-                  className="w-full" 
                   onClick={handleProcess}
                   disabled={files.length === 0 || isProcessing}
+                  className="w-full mt-6"
                 >
                   {isProcessing ? (
                     <>
@@ -210,40 +190,68 @@ export default function ImageResizePage() {
                   ) : (
                     <>
                       <Download className="w-4 h-4 mr-2" />
-                      리사이즈 시작
+                      이미지 리사이즈
                     </>
                   )}
                 </Button>
               </div>
             </div>
 
-            {/* Pro Upgrade */}
-            <div className="card bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Pro 업그레이드
-              </h3>
-              <p className="text-gray-600 text-sm mb-4">
-                더 큰 파일, 배치 처리, 고급 옵션
-              </p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => setIsProModalOpen(true)}
-              >
-                Pro로 업그레이드
-              </Button>
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Features */}
+              <div className="card">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  주요 기능
+                </h3>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
+                    <span className="text-gray-600">JPEG, PNG, WebP 지원</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
+                    <span className="text-gray-600">품질 조절 (10-100%)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
+                    <span className="text-gray-600">종횡비 유지 옵션</span>
+                  </li>
+                  <li className="flex items-start">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 mr-3"></div>
+                    <span className="text-gray-600">배치 처리 (최대 5개)</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Pro Upgrade */}
+              <div className="card bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Pro 업그레이드
+                </h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  더 큰 파일, 더 많은 배치 처리, 고급 옵션
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setIsProModalOpen(true)}
+                >
+                  Pro로 업그레이드
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Back to Home */}
-        <div className="text-center mt-12">
-          <a 
-            href="/" 
-            className="text-primary-600 hover:text-primary-700 font-medium"
-          >
-            ← 홈으로 돌아가기
-          </a>
+          {/* Back to Home */}
+          <div className="text-center mt-12">
+            <a 
+              href="/" 
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
+              ← 홈으로 돌아가기
+            </a>
+          </div>
         </div>
       </div>
       
@@ -253,6 +261,6 @@ export default function ImageResizePage() {
         onClose={() => setIsProModalOpen(false)}
         trigger="image-resize"
       />
-    </div>
+    </>
   )
 }

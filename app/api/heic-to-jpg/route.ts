@@ -7,9 +7,31 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const files = formData.getAll('files') as File[]
     const quality = parseInt(formData.get('quality') as string) || 90
+    const isPro = formData.get('isPro') === 'true'
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: '파일이 선택되지 않았습니다.' }, { status: 400 })
+    }
+
+    // 무료 한도 체크
+    const maxFiles = isPro ? 30 : 5
+    const maxFileSize = isPro ? 150 * 1024 * 1024 : 30 * 1024 * 1024 // 150MB vs 30MB
+
+    if (files.length > maxFiles) {
+      return NextResponse.json({ 
+        error: `무료 버전은 최대 ${maxFiles}개 파일만 변환 가능합니다. Pro 업그레이드를 고려해보세요.`,
+        requiresPro: true 
+      }, { status: 403 })
+    }
+
+    // 파일 크기 체크
+    for (const file of files) {
+      if (file.size > maxFileSize) {
+        return NextResponse.json({ 
+          error: `파일 크기가 ${isPro ? '150MB' : '30MB'}를 초과합니다: ${file.name}. Pro 업그레이드를 고려해보세요.`,
+          requiresPro: true 
+        }, { status: 413 })
+      }
     }
 
     const processedFiles: { name: string; buffer: Buffer }[] = []

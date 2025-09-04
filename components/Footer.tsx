@@ -57,6 +57,16 @@ export default function Footer() {
                   WebP → JPG 변환
                 </Link>
               </li>
+              <li>
+                <Link href="/tools/qr-generator" className="text-gray-400 hover:text-white transition-colors">
+                  QR 코드 생성
+                </Link>
+              </li>
+              <li>
+                <Link href="/tools/srt-editor" className="text-gray-400 hover:text-white transition-colors">
+                  SRT 자막 편집
+                </Link>
+              </li>
             </ul>
           </div>
 

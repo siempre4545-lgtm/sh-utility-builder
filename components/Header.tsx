@@ -27,6 +27,12 @@ export default function Header() {
             <Link href="/tools" className="text-gray-600 hover:text-gray-900 transition-colors">
               도구
             </Link>
+            <Link href="/tools/qr-generator" className="text-gray-600 hover:text-gray-900 transition-colors">
+              QR 생성
+            </Link>
+            <Link href="/tools/srt-editor" className="text-gray-600 hover:text-gray-900 transition-colors">
+              자막 편집
+            </Link>
             <Link href="/faq" className="text-gray-600 hover:text-gray-900 transition-colors">
               FAQ
             </Link>
@@ -57,6 +63,20 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 도구
+              </Link>
+              <Link 
+                href="/tools/qr-generator" 
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                QR 생성
+              </Link>
+              <Link 
+                href="/tools/srt-editor" 
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                자막 편집
               </Link>
               <Link 
                 href="/faq" 

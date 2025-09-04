@@ -1,28 +1,65 @@
-import type { Metadata } from 'next'
-import { Button } from '@/components/ui/Button'
-import { Zap, Upload, Download, Globe } from 'lucide-react'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'WebP to JPG 변환기 - WebP를 JPG로 무료 변환 | SH Tools',
-  description: 'Google WebP 이미지를 호환성 높은 JPG로 무료 변환하세요. 압축 최적화, 메타데이터 보존, 빠른 처리. 브라우저에서 바로 사용 가능한 안전한 WebP 변환 도구.',
-  keywords: 'WebP to JPG, WebP 변환, WebP JPG 변환기, 온라인 WebP 변환, 무료 WebP 변환, Google WebP',
-  openGraph: {
-    title: 'WebP to JPG 변환기 - WebP를 JPG로 무료 변환',
-    description: 'Google WebP 이미지를 호환성 높은 JPG로 무료 변환하세요. 압축 최적화, 메타데이터 보존, 빠른 처리.',
-    url: 'https://sh-utility-builder-dn13.vercel.app/tools/webp-to-jpg',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'WebP to JPG 변환기 - WebP를 JPG로 무료 변환',
-    description: 'Google WebP 이미지를 호환성 높은 JPG로 무료 변환하세요. 압축 최적화, 메타데이터 보존, 빠른 처리.',
-  },
-  alternates: {
-    canonical: 'https://sh-utility-builder-dn13.vercel.app/tools/webp-to-jpg',
-  },
-}
+import { useState } from 'react'
+import { Button } from '@/components/ui/Button'
+import { Zap, Download, Globe, Loader2 } from 'lucide-react'
+import FileUpload from '@/components/FileUpload'
+import ProModal from '@/components/ProModal'
+import { toast } from 'sonner'
 
 export default function WebpToJpgPage() {
+  const [files, setFiles] = useState<File[]>([])
+  const [quality, setQuality] = useState(90)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isProModalOpen, setIsProModalOpen] = useState(false)
+
+  const handleFilesSelected = (selectedFiles: File[]) => {
+    setFiles(selectedFiles)
+  }
+
+  const handleProcess = async () => {
+    if (files.length === 0) {
+      toast.error('WebP 파일을 선택해주세요.')
+      return
+    }
+
+    setIsProcessing(true)
+    
+    try {
+      const formData = new FormData()
+      files.forEach(file => formData.append('files', file))
+      formData.append('quality', quality.toString())
+
+      const response = await fetch('/api/webp-to-jpg', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || '처리 중 오류가 발생했습니다.')
+      }
+
+      // 파일 다운로드
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `webp_converted_${Date.now()}.zip`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast.success('WebP 변환이 완료되었습니다!')
+    } catch (error) {
+      console.error('처리 오류:', error)
+      toast.error(error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,20 +82,39 @@ export default function WebpToJpgPage() {
           {/* Upload Area */}
           <div className="lg:col-span-2">
             <div className="card">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-primary-500 transition-colors">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  WebP 파일을 업로드하세요
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  WebP 이미지 파일을 드래그하거나 클릭하여 선택
-                </p>
-                <Button size="lg">
-                  WebP 파일 선택
-                </Button>
-                <p className="text-sm text-gray-500 mt-4">
-                  최대 파일 크기: 25MB
-                </p>
+              <FileUpload
+                onFilesSelected={handleFilesSelected}
+                acceptedTypes={['image/webp']}
+                maxSize={25}
+                maxFiles={10}
+                disabled={isProcessing}
+              />
+            </div>
+
+            {/* Conversion Info */}
+            <div className="card mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Globe className="w-5 h-5 mr-2" />
+                변환 설정
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    품질 (%) - {quality}
+                  </label>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="100" 
+                    value={quality}
+                    onChange={(e) => setQuality(parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-500 mt-1">
+                    <span>낮음</span>
+                    <span>높음</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -121,8 +177,22 @@ export default function WebpToJpgPage() {
                 <p className="text-gray-600 mb-4">
                   변환된 JPG 파일을 다운로드하세요
                 </p>
-                <Button className="w-full" disabled>
-                  변환 준비 중...
+                <Button 
+                  className="w-full" 
+                  onClick={handleProcess}
+                  disabled={files.length === 0 || isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      변환 중...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      변환 시작
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -135,7 +205,11 @@ export default function WebpToJpgPage() {
               <p className="text-gray-600 text-sm mb-4">
                 더 큰 파일, 배치 처리, 고급 옵션
               </p>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setIsProModalOpen(true)}
+              >
                 Pro로 업그레이드
               </Button>
             </div>
@@ -152,6 +226,13 @@ export default function WebpToJpgPage() {
           </a>
         </div>
       </div>
+      
+      {/* Pro Modal */}
+      <ProModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)}
+        trigger="webp-to-jpg"
+      />
     </div>
   )
 }

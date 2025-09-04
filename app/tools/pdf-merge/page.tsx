@@ -1,28 +1,79 @@
-import type { Metadata } from 'next'
-import { Button } from '@/components/ui/Button'
-import { FileText, Upload, Download, ArrowUpDown } from 'lucide-react'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'PDF 병합 도구 - 여러 PDF를 하나로 무료 병합 | SH Tools',
-  description: '여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력. 브라우저에서 바로 사용 가능한 안전한 PDF 병합 도구.',
-  keywords: 'PDF 병합, PDF 합치기, PDF 결합, PDF 머지, 온라인 PDF 병합, 무료 PDF 병합',
-  openGraph: {
-    title: 'PDF 병합 도구 - 여러 PDF를 하나로 무료 병합',
-    description: '여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력.',
-    url: 'https://sh-utility-builder-dn13.vercel.app/tools/pdf-merge',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'PDF 병합 도구 - 여러 PDF를 하나로 무료 병합',
-    description: '여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력.',
-  },
-  alternates: {
-    canonical: 'https://sh-utility-builder-dn13.vercel.app/tools/pdf-merge',
-  },
-}
+import { useState } from 'react'
+import { Button } from '@/components/ui/Button'
+import { FileText, Download, ArrowUpDown, Loader2 } from 'lucide-react'
+import FileUpload from '@/components/FileUpload'
+import ProModal from '@/components/ProModal'
+import { toast } from 'sonner'
 
 export default function PdfMergePage() {
+  const [files, setFiles] = useState<File[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isProModalOpen, setIsProModalOpen] = useState(false)
+
+  const handleFilesSelected = (selectedFiles: File[]) => {
+    setFiles(selectedFiles)
+  }
+
+  const moveFile = (index: number, direction: 'up' | 'down') => {
+    const newFiles = [...files]
+    if (direction === 'up' && index > 0) {
+      [newFiles[index], newFiles[index - 1]] = [newFiles[index - 1], newFiles[index]]
+    } else if (direction === 'down' && index < newFiles.length - 1) {
+      [newFiles[index], newFiles[index + 1]] = [newFiles[index + 1], newFiles[index]]
+    }
+    setFiles(newFiles)
+  }
+
+  const removeFile = (index: number) => {
+    const newFiles = files.filter((_, i) => i !== index)
+    setFiles(newFiles)
+  }
+
+  const handleProcess = async () => {
+    if (files.length === 0) {
+      toast.error('PDF 파일을 선택해주세요.')
+      return
+    }
+
+    setIsProcessing(true)
+    
+    try {
+      const formData = new FormData()
+      files.forEach(file => formData.append('files', file))
+      formData.append('order', JSON.stringify(Array.from({ length: files.length }, (_, i) => i)))
+
+      const response = await fetch('/api/pdf-merge', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || '처리 중 오류가 발생했습니다.')
+      }
+
+      // 파일 다운로드
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `merged_${Date.now()}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast.success('PDF 병합이 완료되었습니다!')
+    } catch (error) {
+      console.error('처리 오류:', error)
+      toast.error(error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,57 +96,59 @@ export default function PdfMergePage() {
           {/* Upload Area */}
           <div className="lg:col-span-2">
             <div className="card">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-primary-500 transition-colors">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  PDF 파일들을 업로드하세요
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  병합할 PDF 파일들을 드래그하거나 클릭하여 선택
-                </p>
-                <Button size="lg">
-                  PDF 파일 선택
-                </Button>
-                <p className="text-sm text-gray-500 mt-4">
-                  최대 파일 크기: 100MB (총합)
-                </p>
-              </div>
+              <FileUpload
+                onFilesSelected={handleFilesSelected}
+                acceptedTypes={['application/pdf']}
+                maxSize={100}
+                maxFiles={10}
+                disabled={isProcessing}
+              />
             </div>
 
             {/* File List */}
-            <div className="card mt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <ArrowUpDown className="w-5 h-5 mr-2" />
-                파일 순서
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center">
-                    <FileText className="w-5 h-5 text-red-500 mr-3" />
-                    <span className="text-gray-900">document1.pdf</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">↑</Button>
-                    <Button variant="outline" size="sm">↓</Button>
-                    <Button variant="outline" size="sm">삭제</Button>
-                  </div>
+            {files.length > 0 && (
+              <div className="card mt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <ArrowUpDown className="w-5 h-5 mr-2" />
+                  파일 순서
+                </h3>
+                <div className="space-y-3">
+                  {files.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <FileText className="w-5 h-5 text-red-500 mr-3" />
+                        <span className="text-gray-900">{file.name}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => moveFile(index, 'up')}
+                          disabled={index === 0}
+                        >
+                          ↑
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => moveFile(index, 'down')}
+                          disabled={index === files.length - 1}
+                        >
+                          ↓
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => removeFile(index)}
+                        >
+                          삭제
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center">
-                    <FileText className="w-5 h-5 text-red-500 mr-3" />
-                    <span className="text-gray-900">document2.pdf</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm">↑</Button>
-                    <Button variant="outline" size="sm">↓</Button>
-                    <Button variant="outline" size="sm">삭제</Button>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 text-center py-4">
-                  파일을 업로드하면 여기에 표시됩니다
-                </p>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -135,8 +188,22 @@ export default function PdfMergePage() {
                 <p className="text-gray-600 mb-4">
                   병합된 PDF를 다운로드하세요
                 </p>
-                <Button className="w-full" disabled>
-                  병합 준비 중...
+                <Button 
+                  className="w-full" 
+                  onClick={handleProcess}
+                  disabled={files.length === 0 || isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      병합 중...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      병합 시작
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -149,7 +216,11 @@ export default function PdfMergePage() {
               <p className="text-gray-600 text-sm mb-4">
                 더 큰 파일, 배치 처리, 고급 옵션
               </p>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setIsProModalOpen(true)}
+              >
                 Pro로 업그레이드
               </Button>
             </div>
@@ -166,6 +237,13 @@ export default function PdfMergePage() {
           </a>
         </div>
       </div>
+      
+      {/* Pro Modal */}
+      <ProModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)}
+        trigger="pdf-merge"
+      />
     </div>
   )
 }

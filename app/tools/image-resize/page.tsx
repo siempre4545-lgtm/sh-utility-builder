@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Image, Download, Settings, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
+import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 
 export default function ImageResizePage() {
@@ -13,6 +14,7 @@ export default function ImageResizePage() {
   const [quality, setQuality] = useState(85)
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(true)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isProModalOpen, setIsProModalOpen] = useState(false)
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
@@ -223,7 +225,11 @@ export default function ImageResizePage() {
               <p className="text-gray-600 text-sm mb-4">
                 더 큰 파일, 배치 처리, 고급 옵션
               </p>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setIsProModalOpen(true)}
+              >
                 Pro로 업그레이드
               </Button>
             </div>
@@ -240,6 +246,13 @@ export default function ImageResizePage() {
           </a>
         </div>
       </div>
+      
+      {/* Pro Modal */}
+      <ProModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)}
+        trigger="image-resize"
+      />
     </div>
   )
 }

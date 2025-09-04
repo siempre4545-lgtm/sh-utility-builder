@@ -4,12 +4,14 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Download, Smartphone, Camera, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
+import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 
 export default function HeicToJpgPage() {
   const [files, setFiles] = useState<File[]>([])
   const [quality, setQuality] = useState(90)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isProModalOpen, setIsProModalOpen] = useState(false)
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
@@ -182,7 +184,11 @@ export default function HeicToJpgPage() {
               <p className="text-gray-600 text-sm mb-4">
                 더 큰 파일, 배치 처리, 고급 옵션
               </p>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setIsProModalOpen(true)}
+              >
                 Pro로 업그레이드
               </Button>
             </div>
@@ -199,6 +205,13 @@ export default function HeicToJpgPage() {
           </a>
         </div>
       </div>
+      
+      {/* Pro Modal */}
+      <ProModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)}
+        trigger="heic-to-jpg"
+      />
     </div>
   )
 }

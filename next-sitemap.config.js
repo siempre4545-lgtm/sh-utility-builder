@@ -48,6 +48,20 @@ module.exports = {
       lastmod: new Date().toISOString(),
     })
 
+    result.push({
+      loc: '/privacy',
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: new Date().toISOString(),
+    })
+
+    result.push({
+      loc: '/terms',
+      changefreq: 'monthly',
+      priority: 0.5,
+      lastmod: new Date().toISOString(),
+    })
+
     return result
   },
   robotsTxtOptions: {
@@ -75,6 +89,8 @@ module.exports = {
       '/tools/srt-editor': 0.8,
       '/faq': 0.7,
       '/contact': 0.6,
+      '/privacy': 0.5,
+      '/terms': 0.5,
     }
 
     return {

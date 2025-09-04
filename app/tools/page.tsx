@@ -1,18 +1,8 @@
-import type { Metadata } from 'next'
+'use client'
+
 import Link from 'next/link'
 import { Image, FileText, Download, Zap, QrCode, Languages, Video } from 'lucide-react'
-
-export const metadata: Metadata = {
-  title: '모든 도구 - SH Tools | 파일 변환 도구 모음',
-  description: '이미지 리사이즈, PDF 병합, HEIC 변환, WebP 변환, QR 코드 생성 등 다양한 파일 변환 도구를 한 곳에서 사용하세요.',
-  keywords: '파일 변환, 이미지 리사이즈, PDF 병합, HEIC 변환, WebP 변환, QR 코드, 온라인 도구',
-  openGraph: {
-    title: '모든 도구 - SH Tools',
-    description: '이미지 리사이즈, PDF 병합, HEIC 변환, WebP 변환, QR 코드 생성 등 다양한 파일 변환 도구를 한 곳에서 사용하세요.',
-    url: 'https://sh-utility-builder-dn13.vercel.app/tools',
-    type: 'website',
-  },
-}
+import { useState } from 'react'
 
 const tools = [
   {
@@ -80,6 +70,12 @@ const tools = [
 const categories = ['전체', '이미지', '문서', '생성', '미디어']
 
 export default function ToolsPage() {
+  const [selectedCategory, setSelectedCategory] = useState('전체')
+
+  const filteredTools = selectedCategory === '전체' 
+    ? tools 
+    : tools.filter(tool => tool.category === selectedCategory)
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -98,16 +94,33 @@ export default function ToolsPage() {
           {categories.map((category) => (
             <button
               key={category}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:bg-primary-100 hover:text-primary-700"
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                selectedCategory === category
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-white text-gray-600 hover:bg-primary-100 hover:text-primary-700 border border-gray-200'
+              }`}
             >
               {category}
             </button>
           ))}
         </div>
 
+        {/* Category Description */}
+        {selectedCategory !== '전체' && (
+          <div className="text-center mb-8">
+            <p className="text-lg text-gray-600">
+              <span className="font-semibold text-primary-600">{selectedCategory}</span> 카테고리의 도구들
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              {filteredTools.length}개의 도구가 있습니다
+            </p>
+          </div>
+        )}
+
         {/* Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tools.map((tool) => (
+          {filteredTools.map((tool) => (
             <Link key={tool.id} href={tool.href}>
               <div className="card hover:shadow-lg transition-all duration-300 h-full group">
                 <div className={`w-12 h-12 bg-gradient-to-r ${tool.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
@@ -143,6 +156,27 @@ export default function ToolsPage() {
             </Link>
           ))}
         </div>
+
+        {/* No Results Message */}
+        {filteredTools.length === 0 && (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Image className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              해당 카테고리에 도구가 없습니다
+            </h3>
+            <p className="text-gray-600 mb-4">
+              다른 카테고리를 선택하거나 전체 도구를 확인해 보세요.
+            </p>
+            <button
+              onClick={() => setSelectedCategory('전체')}
+              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              전체 도구 보기
+            </button>
+          </div>
+        )}
 
         {/* Back to Home */}
         <div className="text-center mt-12">

@@ -6,6 +6,7 @@ import { Zap, Download, Globe, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
+import Head from 'next/head'
 
 export default function WebpToJpgPage() {
   const [files, setFiles] = useState<File[]>([])
@@ -61,7 +62,21 @@ export default function WebpToJpgPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Head>
+        <title>무료 WebP JPG 변환기 - Google WebP를 JPG로 변환 | SH Tools</title>
+        <meta name="description" content="무료로 Google WebP 이미지를 JPG로 변환하세요. 호환성 향상, 압축 최적화, 메타데이터 보존. WebP 파일을 널리 호환되는 JPG 형식으로 변환하는 온라인 도구." />
+        <meta name="keywords" content="WebP JPG 변환, WebP 변환기, 무료 WebP 변환, WebP to JPG, Google WebP 변환, 온라인 WebP 변환, WebP JPG 변환기" />
+        <meta property="og:title" content="무료 WebP JPG 변환기 - Google WebP를 JPG로 변환" />
+        <meta property="og:description" content="무료로 Google WebP 이미지를 JPG로 변환하세요. 호환성 향상, 압축 최적화, 메타데이터 보존." />
+        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/webp-to-jpg" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="무료 WebP JPG 변환기" />
+        <meta name="twitter:description" content="무료로 Google WebP 이미지를 JPG로 변환하세요. 호환성 향상, 압축 최적화, 메타데이터 보존." />
+      </Head>
+
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -233,6 +248,7 @@ export default function WebpToJpgPage() {
         onClose={() => setIsProModalOpen(false)}
         trigger="webp-to-jpg"
       />
-    </div>
+      </div>
+    </>
   )
 }

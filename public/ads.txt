@@ -1,0 +1,3 @@
+# Google AdSense ads.txt 파일
+# Google AdSense 승인 후 실제 퍼블리셔 ID로 교체하세요
+# 예: google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { QrCode, Download, Loader2, Copy, Check } from 'lucide-react'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
+import Head from 'next/head'
 
 export default function QrGeneratorPage() {
   const [text, setText] = useState('')
@@ -75,7 +76,21 @@ export default function QrGeneratorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Head>
+        <title>무료 QR 코드 생성기 - 텍스트, URL을 QR 코드로 변환 | SH Tools</title>
+        <meta name="description" content="무료로 QR 코드를 생성하세요. 텍스트, URL, 연락처를 QR 코드로 변환. 커스텀 디자인, 고해상도 출력. 온라인 QR 코드 생성 도구." />
+        <meta name="keywords" content="QR 코드 생성, 무료 QR 코드, QR 코드 생성기, 온라인 QR 코드, QR 코드 만들기, 텍스트 QR 코드, URL QR 코드" />
+        <meta property="og:title" content="무료 QR 코드 생성기 - 텍스트, URL을 QR 코드로 변환" />
+        <meta property="og:description" content="무료로 QR 코드를 생성하세요. 텍스트, URL, 연락처를 QR 코드로 변환. 커스텀 디자인, 고해상도 출력." />
+        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/qr-generator" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="무료 QR 코드 생성기" />
+        <meta name="twitter:description" content="무료로 QR 코드를 생성하세요. 텍스트, URL, 연락처를 QR 코드로 변환. 커스텀 디자인, 고해상도 출력." />
+      </Head>
+
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -266,6 +281,7 @@ export default function QrGeneratorPage() {
         onClose={() => setIsProModalOpen(false)}
         trigger="qr-generator"
       />
-    </div>
+      </div>
+    </>
   )
 }

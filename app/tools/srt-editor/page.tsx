@@ -6,6 +6,7 @@ import { Video, Download, Upload, Loader2, Clock, Type } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
+import Head from 'next/head'
 
 interface SubtitleEntry {
   id: number
@@ -106,7 +107,21 @@ export default function SrtEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Head>
+        <title>무료 SRT 자막 편집기 - 자막 파일 편집 및 시간 조정 | SH Tools</title>
+        <meta name="description" content="무료로 SRT 자막 파일을 편집하세요. 시간 조정, 텍스트 편집, 번역 지원. 자막 파일을 쉽고 빠르게 편집하는 온라인 도구." />
+        <meta name="keywords" content="SRT 자막 편집, 자막 편집기, SRT 편집, 자막 시간 조정, 자막 텍스트 편집, 온라인 자막 편집, 무료 자막 편집" />
+        <meta property="og:title" content="무료 SRT 자막 편집기 - 자막 파일 편집 및 시간 조정" />
+        <meta property="og:description" content="무료로 SRT 자막 파일을 편집하세요. 시간 조정, 텍스트 편집, 번역 지원." />
+        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/srt-editor" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="무료 SRT 자막 편집기" />
+        <meta name="twitter:description" content="무료로 SRT 자막 파일을 편집하세요. 시간 조정, 텍스트 편집, 번역 지원." />
+      </Head>
+
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -284,6 +299,7 @@ export default function SrtEditorPage() {
         onClose={() => setIsProModalOpen(false)}
         trigger="srt-editor"
       />
-    </div>
+      </div>
+    </>
   )
 }

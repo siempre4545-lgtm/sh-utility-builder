@@ -6,6 +6,7 @@ import { FileText, Download, ArrowUpDown, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
+import Head from 'next/head'
 
 export default function PdfMergePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -75,7 +76,21 @@ export default function PdfMergePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <>
+      <Head>
+        <title>무료 PDF 병합 도구 - 여러 PDF 파일을 하나로 합치기 | SH Tools</title>
+        <meta name="description" content="무료로 여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력. PDF 파일을 쉽고 빠르게 합치는 온라인 도구." />
+        <meta name="keywords" content="PDF 병합, 무료 PDF 합치기, PDF 파일 합치기, PDF 병합 도구, 온라인 PDF 병합, PDF 합치기 무료" />
+        <meta property="og:title" content="무료 PDF 병합 도구 - 여러 PDF 파일을 하나로 합치기" />
+        <meta property="og:description" content="무료로 여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력." />
+        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/pdf-merge" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="무료 PDF 병합 도구" />
+        <meta name="twitter:description" content="무료로 여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력." />
+      </Head>
+
+      <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -244,6 +259,7 @@ export default function PdfMergePage() {
         onClose={() => setIsProModalOpen(false)}
         trigger="pdf-merge"
       />
-    </div>
+      </div>
+    </>
   )
 }

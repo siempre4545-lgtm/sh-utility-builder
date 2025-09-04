@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { X, ExternalLink } from 'lucide-react'
+import { trackAdClick } from '@/components/GoogleAnalytics'
 
 interface AdBannerProps {
   position: 'top' | 'bottom' | 'sidebar'
@@ -48,7 +49,10 @@ export default function AdBanner({ position, size = 'medium' }: AdBannerProps) {
       </button>
 
       {/* Ad Container */}
-      <div className={`w-full ${getSizeClasses()} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative overflow-hidden`}>
+      <div 
+        className={`w-full ${getSizeClasses()} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-primary-400 transition-colors`}
+        onClick={() => trackAdClick(position)}
+      >
         {/* Ad Content Placeholder */}
         <div className="text-center p-4">
           <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center mx-auto mb-3">

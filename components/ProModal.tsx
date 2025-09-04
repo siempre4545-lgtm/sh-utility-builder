@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { X, Check, Zap, Shield, Clock, Star } from 'lucide-react'
+import { trackProUpgrade } from '@/components/GoogleAnalytics'
 
 interface ProModalProps {
   isOpen: boolean
@@ -137,6 +138,8 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
                       : 'bg-gray-900 hover:bg-gray-800'
                   }`}
                   onClick={() => {
+                    // 이벤트 추적
+                    trackProUpgrade(`modal_${plan.name.toLowerCase()}`)
                     // 결제 시스템 연동
                     console.log(`결제 시작: ${plan.name} 플랜`)
                   }}

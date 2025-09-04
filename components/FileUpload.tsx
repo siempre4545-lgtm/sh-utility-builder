@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone'
 import { Upload, X, File, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { formatFileSize, validateFileType, validateFileSize } from '@/lib/utils'
+import { trackFileUpload, trackUserAction } from '@/components/GoogleAnalytics'
 
 interface FileUploadProps {
   onFilesSelected: (files: File[]) => void
@@ -12,6 +13,7 @@ interface FileUploadProps {
   maxSize: number // MB
   maxFiles?: number
   disabled?: boolean
+  toolName?: string // GA4 추적용
 }
 
 export default function FileUpload({
@@ -19,7 +21,8 @@ export default function FileUpload({
   acceptedTypes,
   maxSize,
   maxFiles = 10,
-  disabled = false
+  disabled = false,
+  toolName = 'unknown'
 }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [errors, setErrors] = useState<string[]>([])
@@ -62,7 +65,19 @@ export default function FileUpload({
     setFiles(validFiles)
     setErrors(newErrors)
     onFilesSelected(validFiles)
-  }, [maxSize, maxFiles, onFilesSelected])
+    
+    // GA4 이벤트 추적
+    if (validFiles.length > 0) {
+      const totalSize = validFiles.reduce((sum, file) => sum + file.size, 0)
+      const fileTypes = validFiles.map(file => file.type)
+      trackFileUpload(toolName, validFiles.length, totalSize, fileTypes)
+      trackUserAction('file_upload_success', toolName, {
+        fileCount: validFiles.length,
+        totalSize: totalSize,
+        fileTypes: fileTypes
+      })
+    }
+  }, [maxSize, maxFiles, onFilesSelected, toolName])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

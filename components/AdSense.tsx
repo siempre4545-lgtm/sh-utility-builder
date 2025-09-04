@@ -2,21 +2,43 @@
 
 import { useState, useEffect } from 'react'
 import Script from 'next/script'
+import { trackAdClick } from '@/components/GoogleAnalytics'
 
 interface AdSenseProps {
   adSlot: string
   adFormat?: 'auto' | 'rectangle' | 'vertical' | 'horizontal'
   adStyle?: React.CSSProperties
   className?: string
+  adPosition?: string // GA4 추적용
 }
 
 export default function AdSense({ 
   adSlot, 
   adFormat = 'auto', 
   adStyle = { display: 'block' },
-  className = ''
+  className = '',
+  adPosition = 'unknown'
 }: AdSenseProps) {
   if (!adSlot) return null
+
+  useEffect(() => {
+    // 광고 클릭 이벤트 추적
+    const handleAdClick = () => {
+      trackAdClick(adPosition, adFormat)
+    }
+
+    // 광고 클릭 이벤트 리스너 추가
+    const adElements = document.querySelectorAll('.adsbygoogle')
+    adElements.forEach(ad => {
+      ad.addEventListener('click', handleAdClick)
+    })
+
+    return () => {
+      adElements.forEach(ad => {
+        ad.removeEventListener('click', handleAdClick)
+      })
+    }
+  }, [adSlot, adFormat, adPosition])
 
   return (
     <div className={`adsense-container ${className}`}>

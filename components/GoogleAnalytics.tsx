@@ -49,24 +49,78 @@ export const trackPageView = (url: string) => {
   }
 }
 
-// 파일 업로드 이벤트 추적
-export const trackFileUpload = (toolName: string, fileType: string, fileSize: number) => {
-  trackEvent('file_upload', 'tool_usage', `${toolName}_${fileType}`, fileSize)
+// 파일 업로드 이벤트 추적 (강화)
+export const trackFileUpload = (toolName: string, fileCount: number, totalSize: number, fileTypes: string[]) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'file_upload', {
+      tool_name: toolName,
+      file_count: fileCount,
+      total_size_mb: Math.round(totalSize / 1024 / 1024),
+      file_types: fileTypes.join(','),
+      event_category: 'file_processing',
+    })
+  }
 }
 
-// 파일 변환 이벤트 추적
-export const trackFileConversion = (toolName: string, fromFormat: string, toFormat: string) => {
-  trackEvent('file_conversion', 'tool_usage', `${toolName}_${fromFormat}_to_${toFormat}`)
+// 파일 변환 완료 이벤트 추적 (강화)
+export const trackFileConversion = (toolName: string, success: boolean, processingTime?: number, outputSize?: number) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'file_conversion', {
+      tool_name: toolName,
+      success: success,
+      processing_time_ms: processingTime,
+      output_size_mb: outputSize ? Math.round(outputSize / 1024 / 1024) : undefined,
+      event_category: 'file_processing',
+    })
+  }
 }
 
-// Pro 업그레이드 클릭 추적
-export const trackProUpgrade = (location: string) => {
-  trackEvent('pro_upgrade_click', 'monetization', location)
+// Pro 업그레이드 시도 이벤트 추적 (강화)
+export const trackProUpgrade = (trigger: string, currentPlan: string = 'free', fileCount?: number, totalSize?: number) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'pro_upgrade_attempt', {
+      trigger_location: trigger,
+      current_plan: currentPlan,
+      file_count: fileCount,
+      total_size_mb: totalSize ? Math.round(totalSize / 1024 / 1024) : undefined,
+      event_category: 'monetization',
+    })
+  }
 }
 
-// 광고 클릭 추적
-export const trackAdClick = (adPosition: string) => {
-  trackEvent('ad_click', 'advertising', adPosition)
+// 광고 클릭 이벤트 추적 (강화)
+export const trackAdClick = (adPosition: string, adType: string = 'banner') => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'ad_click', {
+      ad_position: adPosition,
+      ad_type: adType,
+      event_category: 'monetization',
+    })
+  }
+}
+
+// 사용자 행동 이벤트 추적 (신규)
+export const trackUserAction = (action: string, tool?: string, details?: any) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'user_action', {
+      action_name: action,
+      tool_name: tool,
+      action_details: JSON.stringify(details),
+      event_category: 'user_behavior',
+    })
+  }
+}
+
+// 에러 이벤트 추적 (신규)
+export const trackError = (errorType: string, tool: string, errorMessage: string) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'error_occurred', {
+      error_type: errorType,
+      tool_name: tool,
+      error_message: errorMessage,
+      event_category: 'error_tracking',
+    })
+  }
 }
 
 // 전역 gtag 타입 선언

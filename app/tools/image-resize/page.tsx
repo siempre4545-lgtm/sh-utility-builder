@@ -7,6 +7,7 @@ import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
+import { trackFileConversion, trackProUpgrade } from '@/components/GoogleAnalytics'
 
 export default function ImageResizePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -28,6 +29,7 @@ export default function ImageResizePage() {
     }
 
     setIsProcessing(true)
+    const startTime = Date.now()
     
     try {
       const formData = new FormData()
@@ -46,6 +48,9 @@ export default function ImageResizePage() {
       if (!response.ok) {
         const error = await response.json()
         if (error.requiresPro) {
+          // Pro 업그레이드 시도 추적
+          const totalSize = files.reduce((sum, file) => sum + file.size, 0)
+          trackProUpgrade('image-resize', 'free', files.length, totalSize)
           setIsProModalOpen(true)
           return
         }
@@ -62,9 +67,15 @@ export default function ImageResizePage() {
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
       
+      // 성공 이벤트 추적
+      const processingTime = Date.now() - startTime
+      trackFileConversion('image-resize', true, processingTime, blob.size)
+      
       toast.success('이미지 리사이즈가 완료되었습니다!')
     } catch (error) {
       console.error('이미지 리사이즈 오류:', error)
+      const processingTime = Date.now() - startTime
+      trackFileConversion('image-resize', false, processingTime)
       toast.error(error instanceof Error ? error.message : '이미지 리사이즈 중 오류가 발생했습니다.')
     } finally {
       setIsProcessing(false)
@@ -116,6 +127,7 @@ export default function ImageResizePage() {
                   maxSize={50}
                   maxFiles={5}
                   disabled={isProcessing}
+                  toolName="image-resize"
                 />
               </div>
 

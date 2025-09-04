@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { Menu, X, Zap } from 'lucide-react'
 import { useState } from 'react'
+import ProModal from '@/components/ProModal'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isProModalOpen, setIsProModalOpen] = useState(false)
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -31,7 +33,7 @@ export default function Header() {
             <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
               문의
             </Link>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => setIsProModalOpen(true)}>
               Pro 업그레이드
             </Button>
           </nav>
@@ -70,13 +72,20 @@ export default function Header() {
               >
                 문의
               </Link>
-              <Button variant="outline" size="sm" className="w-full">
+              <Button variant="outline" size="sm" className="w-full" onClick={() => setIsProModalOpen(true)}>
                 Pro 업그레이드
               </Button>
             </nav>
           </div>
         )}
       </div>
+      
+      {/* Pro Modal */}
+      <ProModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)}
+        trigger="header"
+      />
     </header>
   )
 }

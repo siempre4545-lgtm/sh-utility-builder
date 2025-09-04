@@ -3,8 +3,12 @@
 import { Button } from '@/components/ui/Button'
 import { ArrowRight, Zap, Shield, Clock } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
+import ProModal from '@/components/ProModal'
 
 export default function Hero() {
+  const [isProModalOpen, setIsProModalOpen] = useState(false)
+
   return (
     <section className="gradient-bg py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,7 +29,7 @@ export default function Hero() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
+            <Button variant="outline" size="lg" className="w-full sm:w-auto" onClick={() => setIsProModalOpen(true)}>
               Pro 업그레이드
             </Button>
           </div>
@@ -58,6 +62,13 @@ export default function Hero() {
           </div>
         </div>
       </div>
+      
+      {/* Pro Modal */}
+      <ProModal 
+        isOpen={isProModalOpen} 
+        onClose={() => setIsProModalOpen(false)}
+        trigger="hero"
+      />
     </section>
   )
 }

@@ -1,28 +1,63 @@
-import type { Metadata } from 'next'
-import { Button } from '@/components/ui/Button'
-import { Download, Upload, Smartphone, Camera } from 'lucide-react'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'HEIC to JPG 변환기 - iPhone 사진을 JPG로 무료 변환 | SH Tools',
-  description: 'iPhone HEIC 사진을 널리 호환되는 JPG로 무료 변환하세요. 고품질 변환, 빠른 처리, 메타데이터 보존. 브라우저에서 바로 사용 가능한 안전한 HEIC 변환 도구.',
-  keywords: 'HEIC to JPG, HEIC 변환, iPhone 사진 변환, HEIC JPG 변환기, 온라인 HEIC 변환, 무료 HEIC 변환',
-  openGraph: {
-    title: 'HEIC to JPG 변환기 - iPhone 사진을 JPG로 무료 변환',
-    description: 'iPhone HEIC 사진을 널리 호환되는 JPG로 무료 변환하세요. 고품질 변환, 빠른 처리, 메타데이터 보존.',
-    url: 'https://sh-utility-builder-dn13.vercel.app/tools/heic-to-jpg',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'HEIC to JPG 변환기 - iPhone 사진을 JPG로 무료 변환',
-    description: 'iPhone HEIC 사진을 널리 호환되는 JPG로 무료 변환하세요. 고품질 변환, 빠른 처리, 메타데이터 보존.',
-  },
-  alternates: {
-    canonical: 'https://sh-utility-builder-dn13.vercel.app/tools/heic-to-jpg',
-  },
-}
+import { useState } from 'react'
+import { Button } from '@/components/ui/Button'
+import { Download, Smartphone, Camera, Loader2 } from 'lucide-react'
+import FileUpload from '@/components/FileUpload'
+import { toast } from 'sonner'
 
 export default function HeicToJpgPage() {
+  const [files, setFiles] = useState<File[]>([])
+  const [quality, setQuality] = useState(90)
+  const [isProcessing, setIsProcessing] = useState(false)
+
+  const handleFilesSelected = (selectedFiles: File[]) => {
+    setFiles(selectedFiles)
+  }
+
+  const handleProcess = async () => {
+    if (files.length === 0) {
+      toast.error('파일을 선택해주세요.')
+      return
+    }
+
+    setIsProcessing(true)
+    
+    try {
+      const formData = new FormData()
+      files.forEach(file => formData.append('files', file))
+      formData.append('quality', quality.toString())
+
+      const response = await fetch('/api/heic-to-jpg', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || '처리 중 오류가 발생했습니다.')
+      }
+
+      // 파일 다운로드
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `heic_converted_${Date.now()}.zip`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast.success('HEIC 변환이 완료되었습니다!')
+    } catch (error) {
+      console.error('처리 오류:', error)
+      toast.error(error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -45,41 +80,39 @@ export default function HeicToJpgPage() {
           {/* Upload Area */}
           <div className="lg:col-span-2">
             <div className="card">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-primary-500 transition-colors">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  HEIC 파일을 업로드하세요
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  iPhone에서 촬영한 HEIC 파일을 드래그하거나 클릭하여 선택
-                </p>
-                <Button size="lg">
-                  HEIC 파일 선택
-                </Button>
-                <p className="text-sm text-gray-500 mt-4">
-                  최대 파일 크기: 50MB
-                </p>
-              </div>
+              <FileUpload
+                onFilesSelected={handleFilesSelected}
+                acceptedTypes={['image/heic', 'image/heif']}
+                maxSize={50}
+                maxFiles={10}
+                disabled={isProcessing}
+              />
             </div>
 
             {/* Conversion Info */}
             <div className="card mt-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                 <Camera className="w-5 h-5 mr-2" />
-                변환 정보
+                변환 설정
               </h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-medium text-blue-900 mb-2">HEIC 형식이란?</h4>
-                <p className="text-blue-800 text-sm mb-3">
-                  HEIC(High Efficiency Image Container)는 Apple이 iPhone에서 사용하는 
-                  고효율 이미지 형식입니다. 파일 크기는 작지만 호환성 문제가 있을 수 있습니다.
-                </p>
-                <h4 className="font-medium text-blue-900 mb-2">JPG 변환의 장점</h4>
-                <ul className="text-blue-800 text-sm space-y-1">
-                  <li>• 모든 기기와 소프트웨어에서 호환</li>
-                  <li>• 웹사이트 업로드 및 공유 용이</li>
-                  <li>• 소셜미디어 플랫폼 지원</li>
-                </ul>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    품질 (%) - {quality}
+                  </label>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="100" 
+                    value={quality}
+                    onChange={(e) => setQuality(parseInt(e.target.value))}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-500 mt-1">
+                    <span>낮음</span>
+                    <span>높음</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -121,8 +154,22 @@ export default function HeicToJpgPage() {
                 <p className="text-gray-600 mb-4">
                   변환된 JPG 파일을 다운로드하세요
                 </p>
-                <Button className="w-full" disabled>
-                  변환 준비 중...
+                <Button 
+                  className="w-full" 
+                  onClick={handleProcess}
+                  disabled={files.length === 0 || isProcessing}
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      변환 중...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      변환 시작
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

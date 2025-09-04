@@ -12,9 +12,9 @@
 
 ### 2단계: 데이터 스트림 설정
 1. 플랫폼: "웹" 선택
-2. 웹사이트 URL: `https://sh-utility-builder-dn13.vercel.app`
+2. 웹사이트 URL: `https://sh-utility-builder.vercel.app`
 3. 스트림 이름: "SH Tools Main"
-4. **측정 ID 복사** (G-XXXXXXXXXX 형식)
+4. **측정 ID 복사** (G-FGQK44BJR9)
 
 ### 3단계: 환경 변수 설정
 Vercel 대시보드에서 환경 변수 추가:
@@ -27,7 +27,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ### 1단계: AdSense 계정 생성
 1. [Google AdSense](https://www.google.com/adsense/) 접속
 2. "시작하기" 클릭
-3. 웹사이트 URL: `https://sh-utility-builder-dn13.vercel.app`
+3. 웹사이트 URL: `https://sh-utility-builder.vercel.app`
 4. 국가/지역: "대한민국"
 5. 결제 정보 입력
 
@@ -59,7 +59,7 @@ NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXX
 ### 1단계: 사이트 등록
 1. [Google Search Console](https://search.google.com/search-console/) 접속
 2. "속성 추가" 클릭
-3. URL 접두어: `https://sh-utility-builder-dn13.vercel.app`
+3. URL 접두어: `https://sh-utility-builder.vercel.app`
 
 ### 2단계: 소유권 확인
 1. "HTML 파일" 방법 선택
@@ -83,7 +83,7 @@ NEXT_PUBLIC_ADSENSE_ID=ca-pub-XXXXXXXXXX
 NEXT_PUBLIC_ADSENSE_CLIENT_ID=ca-pub-XXXXXXXXXX
 
 # Site URL
-SITE_URL=https://sh-utility-builder-dn13.vercel.app
+SITE_URL=https://sh-utility-builder.vercel.app
 ```
 
 ## 📋 체크리스트

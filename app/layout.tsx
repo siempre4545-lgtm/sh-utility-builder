@@ -16,16 +16,19 @@ export const metadata: Metadata = {
   authors: [{ name: 'SH Tools' }],
   creator: 'SH Tools',
   publisher: 'SH Tools',
+  verification: {
+    google: 'D5PCytY_76rKdtOt_RhpCj_Yx5HnmYFTBe43IZOyUhc',
+  },
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://sh-utility-builder-dn13.vercel.app'),
+  metadataBase: new URL('https://sh-utility-builder.vercel.app'),
   openGraph: {
     title: 'SH Tools - 무료 PDF 병합, WebP JPG 변환기, HEIC JPG 변환 도구',
     description: '무료 PDF 병합, WebP JPG 변환기, HEIC JPG 변환 도구를 제공합니다. 이미지 리사이즈, QR 코드 생성, SRT 자막 편집 등 다양한 온라인 파일 변환 도구를 무료로 사용하세요.',
-    url: 'https://sh-utility-builder-dn13.vercel.app',
+    url: 'https://sh-utility-builder.vercel.app',
     siteName: 'SH Tools',
     images: [
       {

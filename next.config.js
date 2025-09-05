@@ -1,8 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // 성능 최적화
-  compress: true,
   poweredByHeader: false,
+  
+  // 캐싱 완전 비활성화
+  generateEtags: false,
+  compress: false, // 압축도 비활성화하여 캐싱 방지
   
   // 이미지 최적화
   images: {
@@ -119,6 +122,11 @@ const nextConfig = {
         permanent: true,
       },
     ]
+  },
+
+  // 캐시 버스팅을 위한 환경 변수
+  env: {
+    BUILD_TIME: Date.now().toString(),
   },
 }
 

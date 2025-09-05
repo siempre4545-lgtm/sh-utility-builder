@@ -90,6 +90,36 @@ export default function RootLayout({
         <Toaster position="top-right" />
         <Analytics />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
+        
+        {/* Service Worker 제거 및 캐시 클리어 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Service Worker 제거
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                  for(let registration of registrations) {
+                    registration.unregister();
+                  }
+                });
+              }
+              
+              // 캐시 클리어
+              if ('caches' in window) {
+                caches.keys().then(function(names) {
+                  for (let name of names) {
+                    caches.delete(name);
+                  }
+                });
+              }
+              
+              // 페이지 로드 시 캐시 방지
+              if (window.performance && window.performance.navigation.type === 1) {
+                window.location.reload(true);
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )

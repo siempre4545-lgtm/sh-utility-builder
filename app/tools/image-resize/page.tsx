@@ -61,10 +61,12 @@ export default function ImageResizePage() {
         throw new Error(error.error || '이미지 리사이즈 중 오류가 발생했습니다.')
       }
 
+      // 응답을 blob으로 변환
+      const blob = await response.blob()
+      
       // 모바일에서는 개별 파일 다운로드, 데스크톱에서는 ZIP 다운로드
       if (isMobile()) {
         // 모바일: 개별 파일로 다운로드
-        const blob = await response.blob()
         const zip = new (await import('jszip')).default()
         const zipData = await zip.loadAsync(blob)
         
@@ -82,7 +84,6 @@ export default function ImageResizePage() {
         toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
       } else {
         // 데스크톱: ZIP 파일로 다운로드
-        const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url

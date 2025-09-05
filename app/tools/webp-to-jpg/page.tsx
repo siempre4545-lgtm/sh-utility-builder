@@ -52,10 +52,12 @@ export default function WebpToJpgPage() {
       const processingTime = Date.now() - startTime
       const totalSize = files.reduce((sum, file) => sum + file.size, 0)
       
+      // 응답을 blob으로 변환
+      const blob = await response.blob()
+      
       // 모바일에서는 개별 파일 다운로드, 데스크톱에서는 ZIP 다운로드
       if (isMobile()) {
         // 모바일: 개별 파일로 다운로드
-        const blob = await response.blob()
         const zip = new (await import('jszip')).default()
         const zipData = await zip.loadAsync(blob)
         
@@ -81,7 +83,6 @@ export default function WebpToJpgPage() {
       }
 
       // GA4 이벤트 추적
-      const blob = await response.blob()
       trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
       trackUserAction('file_download', 'webp-to-jpg', {
         fileCount: files.length,

@@ -103,9 +103,12 @@ export default function ImageResizePage() {
         // 자동 다운로드 시작
         setIsDownloading(true)
         try {
+          console.log('모바일 자동 다운로드 시작:', convertedFiles.length, '개 파일')
           await downloadMultipleFiles(convertedFiles, 300)
-          toast.success(`${convertedFiles.length}개 파일이 개별적으로 다운로드되었습니다.`)
+          console.log('모바일 자동 다운로드 완료')
+          toast.success(`📱 ${convertedFiles.length}개 이미지가 갤러리에 저장되었습니다!`)
         } catch (error) {
+          console.error('모바일 다운로드 오류:', error)
           toast.error('다운로드 중 오류가 발생했습니다. 아래 버튼을 눌러 다시 시도해주세요.')
         } finally {
           setIsDownloading(false)
@@ -279,7 +282,7 @@ export default function ImageResizePage() {
                                   {resizedFiles.length}개 이미지 리사이즈 완료
                                 </span>
                                 <span className="text-xs text-green-600">
-                                  갤러리에서 확인하세요
+                                  📱 갤러리/사진첩에 자동 저장됨
                                 </span>
                               </div>
                             </div>
@@ -290,8 +293,14 @@ export default function ImageResizePage() {
                           
                           <div className="space-y-3">
                             <div className="bg-white rounded-lg p-3 border border-green-200">
-                              <p className="text-sm text-green-800 text-center">
-                                📱 이미지가 자동으로 다운로드됩니다
+                              <div className="flex items-center justify-center space-x-2">
+                                <span className="text-lg">📱</span>
+                                <p className="text-sm text-green-800 font-medium">
+                                  {isDownloading ? '갤러리에 저장 중...' : '갤러리에 저장 완료!'}
+                                </p>
+                              </div>
+                              <p className="text-xs text-green-600 text-center mt-1">
+                                개별 이미지 파일이 사진첩에 저장됩니다
                               </p>
                             </div>
                             <Button
@@ -304,12 +313,12 @@ export default function ImageResizePage() {
                               {isDownloading ? (
                                 <>
                                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  다운로드 중...
+                                  저장 중...
                                 </>
                               ) : (
                                 <>
                                   <Download className="w-4 h-4 mr-2" />
-                                  다시 다운로드
+                                  다시 저장하기
                                 </>
                               )}
                             </Button>
@@ -321,13 +330,30 @@ export default function ImageResizePage() {
                             <Download className="w-6 h-6 text-green-600" />
                           </div>
                           <p className="text-sm font-medium text-green-800 mb-1">
-                            모바일 최적화 다운로드
+                            📱 모바일 최적화 저장
                           </p>
                           <p className="text-xs text-green-600">
-                            리사이즈 완료 후 개별 파일로 다운로드됩니다
+                            리사이즈 완료 후 갤러리/사진첩에 자동 저장됩니다
                           </p>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* PC 다운로드 안내 */}
+                  {!isMobile() && (
+                    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 shadow-sm">
+                      <div className="text-center py-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Download className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <p className="text-sm font-medium text-blue-800 mb-1">
+                          💻 PC 최적화 다운로드
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          리사이즈 완료 후 ZIP 파일로 다운로드됩니다
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>

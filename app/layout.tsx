@@ -67,6 +67,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        {/* Google AdSense 코드 */}
+        <script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1113623105565685"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={inter.className}>
         <Header />
         <main className="min-h-screen">

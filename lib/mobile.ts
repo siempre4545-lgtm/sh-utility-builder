@@ -38,6 +38,12 @@ export const downloadFile = (file: File, filename?: string): void => {
   link.download = filename || file.name
   link.style.display = 'none'
   
+  // iOS/Android 최적화: 다운로드 속성 설정
+  if (isIOS() || isAndroid()) {
+    link.setAttribute('target', '_blank')
+    link.setAttribute('rel', 'noopener noreferrer')
+  }
+  
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -52,13 +58,18 @@ export const downloadFile = (file: File, filename?: string): void => {
 export const downloadMultipleFiles = async (files: File[], delay: number = 500): Promise<void> => {
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    const filename = file.name.replace(/\.[^/.]+$/, '') + `_${i + 1}.${file.name.split('.').pop()}`
+    // iOS/Android 최적화: 원본 파일명 유지하되 중복 방지
+    const timestamp = Date.now()
+    const fileExtension = file.name.split('.').pop()
+    const baseName = file.name.replace(/\.[^/.]+$/, '')
+    const filename = `${baseName}_${timestamp}_${i + 1}.${fileExtension}`
     
     downloadFile(file, filename)
     
-    // 모바일에서 다운로드 간격을 두어 안정성 확보
+    // iOS/Android 최적화: 다운로드 간격 조정
+    const optimizedDelay = isIOS() ? 800 : isAndroid() ? 600 : delay
     if (i < files.length - 1) {
-      await new Promise(resolve => setTimeout(resolve, delay))
+      await new Promise(resolve => setTimeout(resolve, optimizedDelay))
     }
   }
 }

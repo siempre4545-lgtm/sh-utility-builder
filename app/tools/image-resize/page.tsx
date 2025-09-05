@@ -263,8 +263,50 @@ export default function ImageResizePage() {
                     )}
                   </Button>
                   
+                  {/* 모바일 다운로드 상태 및 수동 다운로드 버튼 */}
+                  {isMobile() && resizedFiles.length > 0 && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center">
+                          <Download className="w-5 h-5 text-green-600 mr-2" />
+                          <span className="text-sm font-medium text-green-900">
+                            {resizedFiles.length}개 이미지 리사이즈 완료
+                          </span>
+                        </div>
+                        {isDownloading && (
+                          <Loader2 className="w-4 h-4 text-green-600 animate-spin" />
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <p className="text-xs text-green-700">
+                          이미지가 자동으로 다운로드됩니다. 갤러리에서 확인하세요.
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleManualDownload}
+                          disabled={isDownloading}
+                          className="w-full text-green-700 border-green-300 hover:bg-green-100"
+                        >
+                          {isDownloading ? (
+                            <>
+                              <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                              다운로드 중...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-3 h-3 mr-2" />
+                              다시 다운로드
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* 모바일 최적화 안내 */}
-                  {isMobile() && (
+                  {isMobile() && resizedFiles.length === 0 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="flex items-start">
                         <Smartphone className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />

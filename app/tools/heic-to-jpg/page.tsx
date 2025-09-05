@@ -18,9 +18,26 @@ export default function HeicToJpgPage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [showAlternativeTools, setShowAlternativeTools] = useState(false)
+  const [convertedFiles, setConvertedFiles] = useState<File[]>([])
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
+    setConvertedFiles([]) // 새 파일 선택 시 변환된 파일 초기화
+  }
+
+  const handleManualDownload = async () => {
+    if (convertedFiles.length === 0) return
+    
+    setIsDownloading(true)
+    try {
+      await downloadMultipleFiles(convertedFiles, 300)
+      toast.success(`${convertedFiles.length}개 파일이 다시 다운로드되었습니다.`)
+    } catch (error) {
+      toast.error('다운로드 중 오류가 발생했습니다.')
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   const handleProcess = async () => {
@@ -53,18 +70,28 @@ export default function HeicToJpgPage() {
         const zip = new (await import('jszip')).default()
         const zipData = await zip.loadAsync(blob)
         
-        const files: File[] = []
+        const convertedFiles: File[] = []
         for (const [filename, file] of Object.entries(zipData.files)) {
           if (!file.dir) {
             const content = await file.async('blob')
             const newFile = new File([content], filename, { type: content.type })
-            files.push(newFile)
+            convertedFiles.push(newFile)
           }
         }
         
-        // 개별 파일 다운로드
-        await downloadMultipleFiles(files, 300)
-        toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
+        // 변환된 파일들을 상태에 저장
+        setConvertedFiles(convertedFiles)
+        
+        // 자동 다운로드 시작
+        setIsDownloading(true)
+        try {
+          await downloadMultipleFiles(convertedFiles, 300)
+          toast.success(`${convertedFiles.length}개 파일이 개별적으로 다운로드되었습니다.`)
+        } catch (error) {
+          toast.error('다운로드 중 오류가 발생했습니다. 아래 버튼을 눌러 다시 시도해주세요.')
+        } finally {
+          setIsDownloading(false)
+        }
       } else {
         // 데스크톱: ZIP 파일로 다운로드
         const blob = await response.blob()
@@ -206,23 +233,67 @@ export default function HeicToJpgPage() {
                 <p className="text-gray-600 mb-4">
                   변환된 JPG 파일을 다운로드하세요
                 </p>
-                <Button 
-                  className="w-full" 
-                  onClick={handleProcess}
-                  disabled={files.length === 0 || isProcessing}
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      변환 중...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4 mr-2" />
-                      변환 시작
-                    </>
+                <div className="space-y-3">
+                  <Button 
+                    className="w-full" 
+                    onClick={handleProcess}
+                    disabled={files.length === 0 || isProcessing}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        변환 중...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        변환 시작
+                      </>
+                    )}
+                  </Button>
+                  
+                  {/* 모바일 다운로드 상태 및 수동 다운로드 버튼 */}
+                  {isMobile() && convertedFiles.length > 0 && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center">
+                          <Download className="w-5 h-5 text-green-600 mr-2" />
+                          <span className="text-sm font-medium text-green-900">
+                            {convertedFiles.length}개 파일 변환 완료
+                          </span>
+                        </div>
+                        {isDownloading && (
+                          <Loader2 className="w-4 h-4 text-green-600 animate-spin" />
+                        )}
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <p className="text-xs text-green-700">
+                          파일이 자동으로 다운로드됩니다. 갤러리에서 확인하세요.
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleManualDownload}
+                          disabled={isDownloading}
+                          className="w-full text-green-700 border-green-300 hover:bg-green-100"
+                        >
+                          {isDownloading ? (
+                            <>
+                              <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                              다운로드 중...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-3 h-3 mr-2" />
+                              다시 다운로드
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
                   )}
-                </Button>
+                </div>
               </div>
             </div>
 

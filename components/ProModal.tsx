@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { X, Check, Zap, Shield, Clock, Star } from 'lucide-react'
+import { X, Check, Zap, Shield, Clock, Star, CreditCard } from 'lucide-react'
 import { trackProUpgrade } from '@/components/GoogleAnalytics'
 import { createCheckoutSession } from '@/lib/stripe'
 
@@ -51,9 +51,13 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
             console.error('Stripe redirect error:', error)
             alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`)
           }
+        } else {
+          throw new Error('Stripe 초기화에 실패했습니다.')
         }
       } else {
-        throw new Error('결제 세션 생성에 실패했습니다.')
+        // API 응답에서 오류 메시지 확인
+        const errorMessage = session.error || '결제 세션 생성에 실패했습니다.'
+        throw new Error(errorMessage)
       }
     } catch (error) {
       console.error('Payment error:', error)
@@ -191,43 +195,39 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
                   onClick={() => handlePayment(plan.name === '월간' ? 'monthly' : 'yearly')}
                   disabled={isLoading}
                 >
-                  {isLoading ? '처리 중...' : `${plan.name} 플랜 선택`}
+                  {isLoading ? '결제 페이지로 이동 중...' : `💳 ${plan.name} 플랜 결제하기`}
                 </Button>
               </div>
             ))}
           </div>
 
-          {/* Payment Methods */}
+          {/* Payment Method */}
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">지원 결제 방법</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-green-50">
-                <span className="text-sm font-medium text-green-700">✓ 신용카드</span>
-              </div>
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-gray-50">
-                <span className="text-sm font-medium text-gray-500">계좌이체</span>
-              </div>
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-gray-50">
-                <span className="text-sm font-medium text-gray-500">간편결제</span>
-              </div>
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-gray-50">
-                <span className="text-sm font-medium text-gray-500">PayPal</span>
+            <div className="flex items-center justify-center p-4 border-2 border-green-200 rounded-lg bg-green-50">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                  <CreditCard className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-green-800">신용카드 결제</h3>
+                  <p className="text-sm text-green-600">Stripe를 통한 안전한 결제</p>
+                </div>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-3 text-center">
-              현재 신용카드 결제만 지원됩니다. Stripe를 통해 안전하게 처리됩니다.
-            </p>
+            <div className="mt-4 flex items-center justify-center space-x-2 text-sm text-gray-600">
+              <Shield className="w-4 h-4" />
+              <span>SSL 암호화 • PCI DSS 준수 • 256비트 보안</span>
+            </div>
           </div>
 
           {/* Security Notice */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <div className="flex items-start space-x-3">
-              <Shield className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center space-x-3">
+              <Shield className="w-5 h-5 text-blue-500 flex-shrink-0" />
               <div>
-                <h4 className="font-medium text-gray-900 mb-1">안전한 결제</h4>
-                <p className="text-sm text-gray-600">
-                  모든 결제는 SSL 암호화로 보호되며, 언제든지 취소할 수 있습니다. 
-                  개인정보는 안전하게 보호됩니다.
+                <h4 className="font-medium text-blue-900">안전한 결제 보장</h4>
+                <p className="text-sm text-blue-700 mt-1">
+                  Stripe의 엔터프라이즈급 보안으로 카드 정보를 안전하게 처리합니다.
                 </p>
               </div>
             </div>

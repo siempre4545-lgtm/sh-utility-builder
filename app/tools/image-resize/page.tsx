@@ -21,9 +21,26 @@ export default function ImageResizePage() {
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(true)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+  const [resizedFiles, setResizedFiles] = useState<File[]>([])
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
+    setResizedFiles([]) // 새 파일 선택 시 리사이즈된 파일 초기화
+  }
+
+  const handleManualDownload = async () => {
+    if (resizedFiles.length === 0) return
+    
+    setIsDownloading(true)
+    try {
+      await downloadMultipleFiles(resizedFiles, 300)
+      toast.success(`${resizedFiles.length}개 파일이 다시 다운로드되었습니다.`)
+    } catch (error) {
+      toast.error('다운로드 중 오류가 발생했습니다.')
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   const handleProcess = async () => {
@@ -70,18 +87,28 @@ export default function ImageResizePage() {
         const zip = new (await import('jszip')).default()
         const zipData = await zip.loadAsync(blob)
         
-        const files: File[] = []
+        const resizedFiles: File[] = []
         for (const [filename, file] of Object.entries(zipData.files)) {
           if (!file.dir) {
             const content = await file.async('blob')
             const newFile = new File([content], filename, { type: content.type })
-            files.push(newFile)
+            resizedFiles.push(newFile)
           }
         }
         
-        // 개별 파일 다운로드
-        await downloadMultipleFiles(files, 300)
-        toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
+        // 리사이즈된 파일들을 상태에 저장
+        setResizedFiles(resizedFiles)
+        
+        // 자동 다운로드 시작
+        setIsDownloading(true)
+        try {
+          await downloadMultipleFiles(resizedFiles, 300)
+          toast.success(`${resizedFiles.length}개 파일이 개별적으로 다운로드되었습니다.`)
+        } catch (error) {
+          toast.error('다운로드 중 오류가 발생했습니다. 아래 버튼을 눌러 다시 시도해주세요.')
+        } finally {
+          setIsDownloading(false)
+        }
       } else {
         // 데스크톱: ZIP 파일로 다운로드
         const url = window.URL.createObjectURL(blob)

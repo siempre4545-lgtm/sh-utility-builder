@@ -11,24 +11,29 @@ if (process.env.STRIPE_SECRET_KEY) {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('=== Stripe Checkout Session Creation Started ===')
+    
     // Stripe 초기화 확인
     if (!stripe) {
-      console.error('Stripe not initialized - STRIPE_SECRET_KEY missing')
+      console.error('❌ Stripe not initialized - STRIPE_SECRET_KEY missing')
       return NextResponse.json({ 
         error: 'Stripe not configured. Please contact support.' 
       }, { status: 500 })
     }
 
     const { priceId, userId } = await request.json()
+    console.log('📝 Request data:', { priceId, userId })
 
     // Price ID 유효성 검사
     if (!priceId) {
+      console.error('❌ Price ID is missing')
       return NextResponse.json({ 
         error: 'Price ID is required' 
       }, { status: 400 })
     }
 
     if (priceId.includes('placeholder')) {
+      console.error('❌ Price ID is placeholder:', priceId)
       return NextResponse.json({ 
         error: 'Payment system not yet configured. Please try again later.' 
       }, { status: 400 })
@@ -37,13 +42,15 @@ export async function POST(request: NextRequest) {
     // Site URL 확인
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
     if (!siteUrl) {
-      console.error('NEXT_PUBLIC_SITE_URL not configured')
+      console.error('❌ NEXT_PUBLIC_SITE_URL not configured')
       return NextResponse.json({ 
         error: 'Site configuration error' 
       }, { status: 500 })
     }
 
-    console.log('Creating Stripe session for price:', priceId)
+    console.log('✅ Environment check passed')
+    console.log('🔗 Site URL:', siteUrl)
+    console.log('💰 Creating Stripe session for price:', priceId)
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

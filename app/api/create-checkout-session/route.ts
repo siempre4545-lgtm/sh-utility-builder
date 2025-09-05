@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     console.log('🔗 Site URL:', siteUrl)
     console.log('💰 Creating Stripe session for price:', priceId)
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig = {
       payment_method_types: ['card'],
       line_items: [
         {
@@ -70,22 +70,39 @@ export async function POST(request: NextRequest) {
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
       customer_creation: 'always',
-    })
+    }
 
-    console.log('Stripe session created:', session.id)
+    console.log('🔧 Stripe session config:', JSON.stringify(sessionConfig, null, 2))
+
+    const session = await stripe.checkout.sessions.create(sessionConfig)
+
+    console.log('✅ Stripe session created successfully:', session.id)
+    console.log('🔗 Session URL:', session.url)
     return NextResponse.json({ sessionId: session.id })
   } catch (error) {
-    console.error('Stripe checkout session creation error:', error)
+    console.error('❌ Stripe checkout session creation error:', error)
     
     // Stripe 오류 타입별 처리
     if (error instanceof Error) {
+      console.error('❌ Error message:', error.message)
+      console.error('❌ Error stack:', error.stack)
+      
       if (error.message.includes('No such price')) {
+        console.error('❌ Invalid price ID:', error.message)
         return NextResponse.json({ 
           error: 'Invalid price configuration. Please contact support.' 
         }, { status: 400 })
       }
+      
+      if (error.message.includes('Invalid API key')) {
+        console.error('❌ Invalid Stripe API key')
+        return NextResponse.json({ 
+          error: 'Payment system configuration error. Please contact support.' 
+        }, { status: 500 })
+      }
     }
     
+    console.error('❌ Unknown error occurred')
     return NextResponse.json(
       { error: 'Failed to create checkout session. Please try again.' },
       { status: 500 }

@@ -60,9 +60,21 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
         throw new Error(errorMessage)
       }
     } catch (error) {
-      console.error('Payment error:', error)
+      console.error('❌ Payment error:', error)
       const errorMessage = error instanceof Error ? error.message : '결제 처리 중 오류가 발생했습니다.'
-      alert(errorMessage)
+      
+      // 더 자세한 오류 메시지 표시
+      if (errorMessage.includes('Stripe not configured')) {
+        alert('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
+      } else if (errorMessage.includes('Payment system not yet configured')) {
+        alert('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
+      } else if (errorMessage.includes('Invalid price configuration')) {
+        alert('결제 설정에 문제가 있습니다. 관리자에게 문의해주세요.')
+      } else if (errorMessage.includes('Payment system configuration error')) {
+        alert('결제 시스템 설정에 오류가 있습니다. 관리자에게 문의해주세요.')
+      } else {
+        alert(`결제 처리 중 오류가 발생했습니다: ${errorMessage}`)
+      }
     } finally {
       setIsLoading(false)
     }

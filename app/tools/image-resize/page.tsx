@@ -91,7 +91,16 @@ export default function ImageResizePage() {
         for (const [filename, file] of Object.entries(zipData.files)) {
           if (!file.dir) {
             const content = await file.async('blob')
-            const newFile = new File([content], filename, { type: content.type })
+            
+            // 원본 파일명에서 확장자 추출
+            const fileExtension = filename.split('.').pop() || 'jpg'
+            const baseName = filename.replace(/\.[^/.]+$/, '')
+            
+            // 리사이즈된 파일임을 명확히 표시하는 파일명 생성
+            const timestamp = Date.now()
+            const resizedFilename = `${baseName}_resized_${timestamp}.${fileExtension}`
+            
+            const newFile = new File([content], resizedFilename, { type: content.type })
             convertedFiles.push(newFile)
           }
         }
@@ -106,7 +115,7 @@ export default function ImageResizePage() {
           console.log('모바일 자동 다운로드 시작:', convertedFiles.length, '개 파일')
           await downloadMultipleFiles(convertedFiles, 300)
           console.log('모바일 자동 다운로드 완료')
-          toast.success(`📱 ${convertedFiles.length}개 이미지가 갤러리에 저장되었습니다!`)
+          toast.success(`📱 ${convertedFiles.length}개 리사이즈된 이미지가 갤러리에 새로 저장되었습니다!`)
         } catch (error) {
           console.error('모바일 다운로드 오류:', error)
           toast.error('다운로드 중 오류가 발생했습니다. 아래 버튼을 눌러 다시 시도해주세요.')
@@ -300,7 +309,7 @@ export default function ImageResizePage() {
                                 </p>
                               </div>
                               <p className="text-xs text-green-600 text-center mt-1">
-                                개별 이미지 파일이 사진첩에 저장됩니다
+                                원본 파일은 그대로 보존되고, 리사이즈된 이미지만 새로 생성됩니다
                               </p>
                             </div>
                             <Button
@@ -333,7 +342,7 @@ export default function ImageResizePage() {
                             📱 모바일 최적화 저장
                           </p>
                           <p className="text-xs text-green-600">
-                            리사이즈 완료 후 갤러리/사진첩에 자동 저장됩니다
+                            원본 파일 보존, 리사이즈된 이미지만 갤러리에 새로 저장됩니다
                           </p>
                         </div>
                       )}

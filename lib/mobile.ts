@@ -58,13 +58,8 @@ export const downloadFile = (file: File, filename?: string): void => {
 export const downloadMultipleFiles = async (files: File[], delay: number = 500): Promise<void> => {
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
-    // iOS/Android 최적화: 원본 파일명 유지하되 중복 방지
-    const timestamp = Date.now()
-    const fileExtension = file.name.split('.').pop()
-    const baseName = file.name.replace(/\.[^/.]+$/, '')
-    const filename = `${baseName}_${timestamp}_${i + 1}.${fileExtension}`
-    
-    downloadFile(file, filename)
+    // 파일명은 이미 리사이즈 페이지에서 적절히 설정됨
+    downloadFile(file, file.name)
     
     // iOS/Android 최적화: 다운로드 간격 조정
     const optimizedDelay = isIOS() ? 800 : isAndroid() ? 600 : delay

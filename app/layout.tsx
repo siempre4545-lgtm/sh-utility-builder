@@ -16,6 +16,12 @@ export const metadata: Metadata = {
   authors: [{ name: 'SH Tools' }],
   creator: 'SH Tools',
   publisher: 'SH Tools',
+  // 캐싱 방지 메타 태그
+  other: {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+  },
   verification: {
     google: 'D5PCytY_76rKdtOt_RhpCj_Yx5HnmYFTBe43IZOyUhc',
   },

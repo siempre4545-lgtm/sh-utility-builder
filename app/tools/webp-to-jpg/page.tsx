@@ -52,12 +52,10 @@ export default function WebpToJpgPage() {
       const processingTime = Date.now() - startTime
       const totalSize = files.reduce((sum, file) => sum + file.size, 0)
       
-      // 응답을 blob으로 변환
-      const blob = await response.blob()
-      
       // 모바일에서는 개별 파일 다운로드, 데스크톱에서는 ZIP 다운로드
       if (isMobile()) {
         // 모바일: 개별 파일로 다운로드
+        const blob = await response.blob()
         const zip = new (await import('jszip')).default()
         const zipData = await zip.loadAsync(blob)
         
@@ -73,23 +71,42 @@ export default function WebpToJpgPage() {
         // 개별 파일 다운로드
         await downloadMultipleFiles(files, 300)
         toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
+        
+        // GA4 이벤트 추적 (모바일)
+        trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
+        trackUserAction('file_download', 'webp-to-jpg', {
+          fileCount: files.length,
+          totalSize: totalSize,
+          outputSize: blob.size,
+          processingTime: processingTime,
+          device: 'mobile'
+        })
       } else {
         // 데스크톱: ZIP 파일로 다운로드
-        await handleApiDownload(response, {
-          filename: `webp_converted_${Date.now()}.zip`,
-          toolName: 'webp-to-jpg',
-          showToast: false // handleApiDownload에서 토스트 표시
+        const blob = await response.blob()
+        
+        // ZIP 파일 다운로드
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `webp_converted_${Date.now()}.zip`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+        
+        toast.success('WebP 파일이 JPG로 변환되어 ZIP 파일로 다운로드되었습니다.')
+        
+        // GA4 이벤트 추적 (데스크톱)
+        trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
+        trackUserAction('file_download', 'webp-to-jpg', {
+          fileCount: files.length,
+          totalSize: totalSize,
+          outputSize: blob.size,
+          processingTime: processingTime,
+          device: 'desktop'
         })
       }
-
-      // GA4 이벤트 추적
-      trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
-      trackUserAction('file_download', 'webp-to-jpg', {
-        fileCount: files.length,
-        totalSize: totalSize,
-        outputSize: blob.size,
-        processingTime: processingTime
-      })
 
       toast.success('WebP 변환이 완료되었습니다!')
     } catch (error) {

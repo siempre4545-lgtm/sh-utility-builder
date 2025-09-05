@@ -1,6 +1,10 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
+
+// 캐싱 비활성화 - 실시간 업데이트 보장
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import { useSearchParams } from 'next/navigation'
 import { CheckCircle, Download, Zap } from 'lucide-react'
 import Link from 'next/link'

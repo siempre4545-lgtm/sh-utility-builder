@@ -1,5 +1,9 @@
 import { Metadata } from 'next'
 
+// 캐싱 비활성화 - 실시간 업데이트 보장
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: '이용약관 - SH Tools',
   description: 'SH Tools의 이용약관입니다. 서비스 이용 시 다음 약관을 준수해 주세요.',

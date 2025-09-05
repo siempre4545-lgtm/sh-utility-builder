@@ -4,6 +4,10 @@ import Link from 'next/link'
 import { Image, FileText, Download, Zap, QrCode, Languages, Video } from 'lucide-react'
 import { useState } from 'react'
 
+// 캐싱 비활성화 - 실시간 업데이트 보장
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const tools = [
   {
     id: 'image-resize',

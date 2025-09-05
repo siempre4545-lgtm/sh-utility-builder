@@ -1,6 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+
+// 캐싱 비활성화 - 실시간 업데이트 보장
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import { Button } from '@/components/ui/Button'
 import { Mail, MessageSquare, Send, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'

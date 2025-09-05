@@ -1,5 +1,9 @@
 import { Metadata } from 'next'
 
+// 캐싱 비활성화 - 실시간 업데이트 보장
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: '개인정보처리방침 - SH Tools',
   description: 'SH Tools의 개인정보처리방침입니다. 사용자의 개인정보 보호를 위해 최선을 다하겠습니다.',

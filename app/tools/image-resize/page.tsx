@@ -87,23 +87,24 @@ export default function ImageResizePage() {
         const zip = new (await import('jszip')).default()
         const zipData = await zip.loadAsync(blob)
         
-        const resizedFiles: File[] = []
+        const convertedFiles: File[] = []
         for (const [filename, file] of Object.entries(zipData.files)) {
           if (!file.dir) {
             const content = await file.async('blob')
             const newFile = new File([content], filename, { type: content.type })
-            resizedFiles.push(newFile)
+            convertedFiles.push(newFile)
           }
         }
         
         // 리사이즈된 파일들을 상태에 저장
-        setResizedFiles(resizedFiles)
+        console.log('모바일 리사이즈 완료:', convertedFiles.length, '개 파일')
+        setResizedFiles(convertedFiles)
         
         // 자동 다운로드 시작
         setIsDownloading(true)
         try {
-          await downloadMultipleFiles(resizedFiles, 300)
-          toast.success(`${resizedFiles.length}개 파일이 개별적으로 다운로드되었습니다.`)
+          await downloadMultipleFiles(convertedFiles, 300)
+          toast.success(`${convertedFiles.length}개 파일이 개별적으로 다운로드되었습니다.`)
         } catch (error) {
           toast.error('다운로드 중 오류가 발생했습니다. 아래 버튼을 눌러 다시 시도해주세요.')
         } finally {
@@ -264,59 +265,69 @@ export default function ImageResizePage() {
                   </Button>
                   
                   {/* 모바일 다운로드 상태 및 수동 다운로드 버튼 */}
-                  {isMobile() && resizedFiles.length > 0 && (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center">
-                          <Download className="w-5 h-5 text-green-600 mr-2" />
-                          <span className="text-sm font-medium text-green-900">
-                            {resizedFiles.length}개 이미지 리사이즈 완료
-                          </span>
-                        </div>
-                        {isDownloading && (
-                          <Loader2 className="w-4 h-4 text-green-600 animate-spin" />
-                        )}
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <p className="text-xs text-green-700">
-                          이미지가 자동으로 다운로드됩니다. 갤러리에서 확인하세요.
-                        </p>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleManualDownload}
-                          disabled={isDownloading}
-                          className="w-full text-green-700 border-green-300 hover:bg-green-100"
-                        >
-                          {isDownloading ? (
-                            <>
-                              <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                              다운로드 중...
-                            </>
-                          ) : (
-                            <>
-                              <Download className="w-3 h-3 mr-2" />
-                              다시 다운로드
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* 모바일 최적화 안내 */}
-                  {isMobile() && resizedFiles.length === 0 && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-start">
-                        <Smartphone className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
-                        <div>
-                          <h4 className="text-sm font-medium text-blue-900 mb-1">모바일 최적화</h4>
-                          <p className="text-xs text-blue-700">
-                            모바일에서는 처리된 이미지가 개별 파일로 다운로드되어 바로 갤러리에 저장됩니다.
+                  {isMobile() && (
+                    <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4 shadow-sm">
+                      {resizedFiles.length > 0 ? (
+                        <>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                                <Download className="w-4 h-4 text-white" />
+                              </div>
+                              <div>
+                                <span className="text-base font-semibold text-green-900 block">
+                                  {resizedFiles.length}개 이미지 리사이즈 완료
+                                </span>
+                                <span className="text-xs text-green-600">
+                                  갤러리에서 확인하세요
+                                </span>
+                              </div>
+                            </div>
+                            {isDownloading && (
+                              <Loader2 className="w-5 h-5 text-green-600 animate-spin" />
+                            )}
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div className="bg-white rounded-lg p-3 border border-green-200">
+                              <p className="text-sm text-green-800 text-center">
+                                📱 이미지가 자동으로 다운로드됩니다
+                              </p>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={handleManualDownload}
+                              disabled={isDownloading}
+                              className="w-full text-green-700 border-green-400 hover:bg-green-100 font-medium"
+                            >
+                              {isDownloading ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  다운로드 중...
+                                </>
+                              ) : (
+                                <>
+                                  <Download className="w-4 h-4 mr-2" />
+                                  다시 다운로드
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Download className="w-6 h-6 text-green-600" />
+                          </div>
+                          <p className="text-sm font-medium text-green-800 mb-1">
+                            모바일 최적화 다운로드
+                          </p>
+                          <p className="text-xs text-green-600">
+                            리사이즈 완료 후 개별 파일로 다운로드됩니다
                           </p>
                         </div>
-                      </div>
+                      )}
                     </div>
                   )}
                 </div>

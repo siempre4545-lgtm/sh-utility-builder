@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
-import { Download, Smartphone, Camera, Loader2 } from 'lucide-react'
+import { Download, Smartphone, Camera, Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
@@ -13,6 +13,7 @@ export default function HeicToJpgPage() {
   const [quality, setQuality] = useState(90)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+  const [showAlternativeTools, setShowAlternativeTools] = useState(false)
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
@@ -55,7 +56,15 @@ export default function HeicToJpgPage() {
       toast.success('HEIC 변환이 완료되었습니다!')
     } catch (error) {
       console.error('처리 오류:', error)
-      toast.error(error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.')
+      const errorMessage = error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.'
+      
+      // HEIC 지원 관련 에러인지 확인
+      if (errorMessage.includes('HEIC') || errorMessage.includes('heic') || errorMessage.includes('지원')) {
+        setShowAlternativeTools(true)
+        toast.error('HEIC 파일 변환에 실패했습니다. 대안 도구를 확인해보세요.')
+      } else {
+        toast.error(errorMessage)
+      }
     } finally {
       setIsProcessing(false)
     }
@@ -209,6 +218,111 @@ export default function HeicToJpgPage() {
             </div>
           </div>
         </div>
+
+        {/* Alternative Tools Section */}
+        {showAlternativeTools && (
+          <div className="mt-8 p-6 bg-yellow-50 border border-yellow-200 rounded-xl">
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+                  HEIC 변환에 문제가 있나요?
+                </h3>
+                <p className="text-yellow-700 mb-4">
+                  일부 HEIC 파일은 브라우저 환경에서 변환이 어려울 수 있습니다. 
+                  아래 대안 도구들을 시도해보세요:
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg border border-yellow-200">
+                    <h4 className="font-medium text-gray-900 mb-2">온라인 대안 도구</h4>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li>
+                        <a 
+                          href="https://cloudconvert.com/heic-to-jpg" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center text-primary-600 hover:text-primary-700"
+                        >
+                          CloudConvert <ExternalLink className="w-3 h-3 ml-1" />
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          href="https://convertio.co/heic-jpg/" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center text-primary-600 hover:text-primary-700"
+                        >
+                          Convertio <ExternalLink className="w-3 h-3 ml-1" />
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          href="https://www.freeconvert.com/heic-to-jpg" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="flex items-center text-primary-600 hover:text-primary-700"
+                        >
+                          FreeConvert <ExternalLink className="w-3 h-3 ml-1" />
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white p-4 rounded-lg border border-yellow-200">
+                    <h4 className="font-medium text-gray-900 mb-2">다른 변환 도구</h4>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li>
+                        <a 
+                          href="/tools/webp-to-jpg" 
+                          className="text-primary-600 hover:text-primary-700"
+                        >
+                          WebP → JPG 변환기
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          href="/tools/image-resize" 
+                          className="text-primary-600 hover:text-primary-700"
+                        >
+                          이미지 리사이즈
+                        </a>
+                      </li>
+                      <li>
+                        <a 
+                          href="/tools/pdf-merge" 
+                          className="text-primary-600 hover:text-primary-700"
+                        >
+                          PDF 병합
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="mt-4 flex space-x-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowAlternativeTools(false)}
+                  >
+                    닫기
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => {
+                      setShowAlternativeTools(false)
+                      setIsProModalOpen(true)
+                    }}
+                  >
+                    Pro로 업그레이드
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Back to Home */}
         <div className="text-center mt-12">

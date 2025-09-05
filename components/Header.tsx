@@ -54,50 +54,60 @@ export default function Header() {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
-            <nav className="flex flex-col space-y-4">
+        <div className={`md:hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+        }`}>
+          <div className="border-t border-gray-200 py-4">
+            <nav className="flex flex-col space-y-4 px-4">
               <Link 
                 href="/tools" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 도구
               </Link>
               <Link 
                 href="/tools/qr-generator" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 QR 생성
               </Link>
               <Link 
                 href="/tools/srt-editor" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 자막 편집
               </Link>
               <Link 
                 href="/faq" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 FAQ
               </Link>
               <Link 
                 href="/contact" 
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-gray-900 transition-colors py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 문의
               </Link>
-              <Button variant="outline" size="sm" className="w-full" onClick={() => setIsProModalOpen(true)}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full mt-4" 
+                onClick={() => {
+                  setIsProModalOpen(true)
+                  setIsMenuOpen(false)
+                }}
+              >
                 Pro 업그레이드
               </Button>
             </nav>
           </div>
-        )}
+        </div>
       </div>
       
       {/* Pro Modal */}

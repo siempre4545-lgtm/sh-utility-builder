@@ -7,6 +7,8 @@ import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
+import { trackFileConversion, trackUserAction } from '@/components/GoogleAnalytics'
+import { handleApiDownload } from '@/lib/download'
 
 export default function WebpToJpgPage() {
   const [files, setFiles] = useState<File[]>([])
@@ -25,6 +27,7 @@ export default function WebpToJpgPage() {
     }
 
     setIsProcessing(true)
+    const startTime = Date.now()
     
     try {
       const formData = new FormData()
@@ -41,20 +44,36 @@ export default function WebpToJpgPage() {
         throw new Error(error.error || '처리 중 오류가 발생했습니다.')
       }
 
-      // 파일 다운로드
+      // 자동 다운로드 처리
+      const processingTime = Date.now() - startTime
+      const totalSize = files.reduce((sum, file) => sum + file.size, 0)
+      
+      await handleApiDownload(response, {
+        filename: `webp_converted_${Date.now()}.zip`,
+        toolName: 'webp-to-jpg',
+        showToast: false // handleApiDownload에서 토스트 표시
+      })
+
+      // GA4 이벤트 추적
       const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `webp_converted_${Date.now()}.zip`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
+      trackUserAction('file_download', 'webp-to-jpg', {
+        fileCount: files.length,
+        totalSize: totalSize,
+        outputSize: blob.size,
+        processingTime: processingTime
+      })
 
       toast.success('WebP 변환이 완료되었습니다!')
     } catch (error) {
       console.error('처리 오류:', error)
+      
+      // 에러 이벤트 추적
+      trackFileConversion('webp-to-jpg', false, Date.now() - startTime)
+      trackUserAction('conversion_error', 'webp-to-jpg', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+      
       toast.error(error instanceof Error ? error.message : '처리 중 오류가 발생했습니다.')
     } finally {
       setIsProcessing(false)

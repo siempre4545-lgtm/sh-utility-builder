@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone'
 import { Upload, X, File, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { formatFileSize, validateFileType, validateFileSize } from '@/lib/utils'
-import { trackFileUpload, trackUserAction } from '@/components/GoogleAnalytics'
+import { trackFileUpload, trackUserAction, trackError } from '@/components/GoogleAnalytics'
 
 interface FileUploadProps {
   onFilesSelected: (files: File[]) => void
@@ -75,6 +75,13 @@ export default function FileUpload({
         fileCount: validFiles.length,
         totalSize: totalSize,
         fileTypes: fileTypes
+      })
+    }
+
+    // 에러 이벤트 추적
+    if (newErrors.length > 0) {
+      newErrors.forEach(error => {
+        trackError('file_validation_error', toolName, error)
       })
     }
   }, [maxSize, maxFiles, onFilesSelected, toolName])

@@ -50,9 +50,11 @@ export default function AdBanner({ position, size = 'medium' }: AdBannerProps) {
 
       {/* Ad Container - AdSense 자동광고와 충돌 방지 */}
       <div 
-        className={`w-full ${getSizeClasses()} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-primary-400 transition-colors ad-manual adsense-exclude`}
+        className={`w-full ${getSizeClasses()} bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative overflow-hidden cursor-pointer hover:border-primary-400 transition-colors ad-manual adsense-exclude exclude-adsense`}
         onClick={() => trackAdClick(position)}
         data-ad-slot={position === 'top' ? 'top-banner' : position === 'bottom' ? 'bottom-banner' : 'sidebar-banner'}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
       >
         {/* Ad Content Placeholder */}
         <div className="text-center p-4">

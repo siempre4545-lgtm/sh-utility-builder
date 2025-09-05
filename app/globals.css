@@ -9,6 +9,15 @@
   z-index: 10;
 }
 
+/* AdSense 제외 영역 */
+.exclude-adsense {
+  /* AdSense가 이 영역을 완전히 피하도록 설정 */
+  position: relative;
+  z-index: 15;
+  /* 자동광고 배치 방지 */
+  pointer-events: auto;
+}
+
 /* AdSense 자동광고 영역 제한 */
 ins.adsbygoogle {
   /* 자동광고가 특정 영역에서만 표시되도록 제한 */
@@ -21,6 +30,26 @@ ins.adsbygoogle {
   position: relative;
   z-index: 5;
   /* 자동광고가 이 영역을 피하도록 설정 */
+  isolation: isolate;
+}
+
+/* 인피드 광고 영역 */
+.infeed-ad-zone {
+  margin: 2rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  /* 자동광고가 이 영역에만 표시되도록 */
+  position: relative;
+  z-index: 1;
+}
+
+/* 인페이지 광고 영역 */
+.inpage-ad-zone {
+  position: relative;
+  z-index: 1;
+  margin: 1rem 0;
+  /* 수동 광고와 충돌 방지 */
   isolation: isolate;
 }
 

@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
+import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/lib/mobile'
 import { Button } from '@/components/ui/Button'
 import { Zap, Download, Globe, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
@@ -51,11 +52,33 @@ export default function WebpToJpgPage() {
       const processingTime = Date.now() - startTime
       const totalSize = files.reduce((sum, file) => sum + file.size, 0)
       
-      await handleApiDownload(response, {
-        filename: `webp_converted_${Date.now()}.zip`,
-        toolName: 'webp-to-jpg',
-        showToast: false // handleApiDownload에서 토스트 표시
-      })
+      // 모바일에서는 개별 파일 다운로드, 데스크톱에서는 ZIP 다운로드
+      if (isMobile()) {
+        // 모바일: 개별 파일로 다운로드
+        const blob = await response.blob()
+        const zip = new (await import('jszip')).default()
+        const zipData = await zip.loadAsync(blob)
+        
+        const files: File[] = []
+        for (const [filename, file] of Object.entries(zipData.files)) {
+          if (!file.dir) {
+            const content = await file.async('blob')
+            const newFile = new File([content], filename, { type: content.type })
+            files.push(newFile)
+          }
+        }
+        
+        // 개별 파일 다운로드
+        await downloadMultipleFiles(files, 300)
+        toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
+      } else {
+        // 데스크톱: ZIP 파일로 다운로드
+        await handleApiDownload(response, {
+          filename: `webp_converted_${Date.now()}.zip`,
+          toolName: 'webp-to-jpg',
+          showToast: false // handleApiDownload에서 토스트 표시
+        })
+      }
 
       // GA4 이벤트 추적
       const blob = await response.blob()

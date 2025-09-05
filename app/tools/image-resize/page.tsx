@@ -5,12 +5,13 @@ import { useState } from 'react'
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/Button'
-import { Image, Download, Settings, Loader2 } from 'lucide-react'
+import { Image, Download, Settings, Loader2, Eye, Smartphone } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
 import { trackFileConversion, trackProUpgrade } from '@/components/GoogleAnalytics'
+import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/lib/mobile'
 
 export default function ImageResizePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -60,15 +61,38 @@ export default function ImageResizePage() {
         throw new Error(error.error || '이미지 리사이즈 중 오류가 발생했습니다.')
       }
 
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `resized_images_${Date.now()}.zip`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
+      // 모바일에서는 개별 파일 다운로드, 데스크톱에서는 ZIP 다운로드
+      if (isMobile()) {
+        // 모바일: 개별 파일로 다운로드
+        const blob = await response.blob()
+        const zip = new (await import('jszip')).default()
+        const zipData = await zip.loadAsync(blob)
+        
+        const files: File[] = []
+        for (const [filename, file] of Object.entries(zipData.files)) {
+          if (!file.dir) {
+            const content = await file.async('blob')
+            const newFile = new File([content], filename, { type: content.type })
+            files.push(newFile)
+          }
+        }
+        
+        // 개별 파일 다운로드
+        await downloadMultipleFiles(files, 300)
+        toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
+      } else {
+        // 데스크톱: ZIP 파일로 다운로드
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `resized_images_${Date.now()}.zip`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        window.URL.revokeObjectURL(url)
+        toast.success('리사이즈된 이미지들이 ZIP 파일로 다운로드되었습니다.')
+      }
       
       // 성공 이벤트 추적
       const processingTime = Date.now() - startTime
@@ -192,23 +216,40 @@ export default function ImageResizePage() {
                     <span className="ml-2 text-sm text-gray-700">종횡비 유지</span>
                   </label>
                 </div>
-                <Button 
-                  onClick={handleProcess}
-                  disabled={files.length === 0 || isProcessing}
-                  className="w-full mt-6"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      처리 중...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4 mr-2" />
-                      이미지 리사이즈
-                    </>
+                <div className="mt-6 space-y-3">
+                  <Button 
+                    onClick={handleProcess}
+                    disabled={files.length === 0 || isProcessing}
+                    className="w-full"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        처리 중...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4 mr-2" />
+                        이미지 리사이즈
+                      </>
+                    )}
+                  </Button>
+                  
+                  {/* 모바일 최적화 안내 */}
+                  {isMobile() && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start">
+                        <Smartphone className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                        <div>
+                          <h4 className="text-sm font-medium text-blue-900 mb-1">모바일 최적화</h4>
+                          <p className="text-xs text-blue-700">
+                            모바일에서는 처리된 이미지가 개별 파일로 다운로드되어 바로 갤러리에 저장됩니다.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   )}
-                </Button>
+                </div>
               </div>
             </div>
 

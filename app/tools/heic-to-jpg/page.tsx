@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
+import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/lib/mobile'
 import { Button } from '@/components/ui/Button'
 import { Download, Smartphone, Camera, Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
@@ -45,16 +46,38 @@ export default function HeicToJpgPage() {
         throw new Error(error.error || '처리 중 오류가 발생했습니다.')
       }
 
-      // 파일 다운로드
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `heic_converted_${Date.now()}.zip`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      // 모바일에서는 개별 파일 다운로드, 데스크톱에서는 ZIP 다운로드
+      if (isMobile()) {
+        // 모바일: 개별 파일로 다운로드
+        const blob = await response.blob()
+        const zip = new (await import('jszip')).default()
+        const zipData = await zip.loadAsync(blob)
+        
+        const files: File[] = []
+        for (const [filename, file] of Object.entries(zipData.files)) {
+          if (!file.dir) {
+            const content = await file.async('blob')
+            const newFile = new File([content], filename, { type: content.type })
+            files.push(newFile)
+          }
+        }
+        
+        // 개별 파일 다운로드
+        await downloadMultipleFiles(files, 300)
+        toast.success(`${files.length}개 파일이 개별적으로 다운로드되었습니다.`)
+      } else {
+        // 데스크톱: ZIP 파일로 다운로드
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `heic_converted_${Date.now()}.zip`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        toast.success('HEIC 파일이 JPG로 변환되어 ZIP 파일로 다운로드되었습니다.')
+      }
 
       toast.success('HEIC 변환이 완료되었습니다!')
     } catch (error) {

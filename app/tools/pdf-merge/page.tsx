@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
+import { isMobile, downloadFile } from '@/lib/mobile'
 import { Button } from '@/components/ui/Button'
 import { FileText, Download, ArrowUpDown, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
@@ -58,16 +59,26 @@ export default function PdfMergePage() {
         throw new Error(error.error || '처리 중 오류가 발생했습니다.')
       }
 
-      // 파일 다운로드
+      // 파일 다운로드 (모바일 최적화)
       const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `merged_${Date.now()}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      const pdfFile = new File([blob], `merged_${Date.now()}.pdf`, { type: 'application/pdf' })
+      
+      if (isMobile()) {
+        // 모바일: 개별 파일 다운로드
+        downloadFile(pdfFile)
+        toast.success('PDF 파일이 다운로드되었습니다. 파일 앱에서 확인하세요.')
+      } else {
+        // 데스크톱: 기존 방식
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `merged_${Date.now()}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        toast.success('PDF 파일이 병합되어 다운로드되었습니다.')
+      }
 
       toast.success('PDF 병합이 완료되었습니다!')
     } catch (error) {

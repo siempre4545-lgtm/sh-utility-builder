@@ -72,6 +72,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/(.*)\\.srt',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'text/plain',
+          },
+        ],
+      },
     ]
   },
 

@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
-export const revalidate = 0
 import { Button } from '@/components/ui/Button'
 import { Image, Download, Settings, Loader2 } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'

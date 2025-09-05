@@ -23,30 +23,42 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
       // 이벤트 추적
       trackProUpgrade(`modal_${planType}`)
       
+      // 환경 변수 확인
+      const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      if (!publishableKey) {
+        throw new Error('Stripe 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.')
+      }
+      
       // Stripe Price ID 설정 (실제 Stripe 대시보드에서 생성된 ID 사용)
       const priceId = planType === 'monthly' 
         ? process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID || 'price_monthly_placeholder'
         : process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID || 'price_yearly_placeholder'
+      
+      // Price ID가 placeholder인지 확인
+      if (priceId.includes('placeholder')) {
+        throw new Error('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
+      }
       
       // 결제 세션 생성
       const session = await createCheckoutSession(priceId)
       
       if (session.sessionId) {
         // Stripe Checkout으로 리다이렉트
-        const stripe = await import('@stripe/stripe-js').then(m => m.loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!))
+        const stripe = await import('@stripe/stripe-js').then(m => m.loadStripe(publishableKey))
         if (stripe) {
           const { error } = await stripe.redirectToCheckout({ sessionId: session.sessionId })
           if (error) {
             console.error('Stripe redirect error:', error)
-            alert('결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.')
+            alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`)
           }
         }
       } else {
-        throw new Error('Failed to create checkout session')
+        throw new Error('결제 세션 생성에 실패했습니다.')
       }
     } catch (error) {
       console.error('Payment error:', error)
-      alert('결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.')
+      const errorMessage = error instanceof Error ? error.message : '결제 처리 중 오류가 발생했습니다.'
+      alert(errorMessage)
     } finally {
       setIsLoading(false)
     }
@@ -187,21 +199,24 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
 
           {/* Payment Methods */}
           <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">결제 방법</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">지원 결제 방법</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">신용카드</span>
+              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-green-50">
+                <span className="text-sm font-medium text-green-700">✓ 신용카드</span>
               </div>
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">계좌이체</span>
+              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <span className="text-sm font-medium text-gray-500">계좌이체</span>
               </div>
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">간편결제</span>
+              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <span className="text-sm font-medium text-gray-500">간편결제</span>
               </div>
-              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg">
-                <span className="text-sm font-medium text-gray-700">PayPal</span>
+              <div className="flex items-center justify-center p-3 border border-gray-200 rounded-lg bg-gray-50">
+                <span className="text-sm font-medium text-gray-500">PayPal</span>
               </div>
             </div>
+            <p className="text-sm text-gray-600 mt-3 text-center">
+              현재 신용카드 결제만 지원됩니다. Stripe를 통해 안전하게 처리됩니다.
+            </p>
           </div>
 
           {/* Security Notice */}

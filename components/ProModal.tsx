@@ -40,15 +40,19 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
       }
       
       // 결제 세션 생성
+      console.log('🔄 Creating checkout session for price:', priceId)
       const session = await createCheckoutSession(priceId)
+      console.log('📝 Session response:', session)
       
       if (session.sessionId) {
         // Stripe Checkout으로 리다이렉트
+        console.log('🔄 Loading Stripe...')
         const stripe = await import('@stripe/stripe-js').then(m => m.loadStripe(publishableKey))
         if (stripe) {
+          console.log('🔄 Redirecting to Stripe Checkout...')
           const { error } = await stripe.redirectToCheckout({ sessionId: session.sessionId })
           if (error) {
-            console.error('Stripe redirect error:', error)
+            console.error('❌ Stripe redirect error:', error)
             alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`)
           }
         } else {
@@ -57,6 +61,7 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
       } else {
         // API 응답에서 오류 메시지 확인
         const errorMessage = session.error || '결제 세션 생성에 실패했습니다.'
+        console.error('❌ Session creation failed:', errorMessage)
         throw new Error(errorMessage)
       }
     } catch (error) {

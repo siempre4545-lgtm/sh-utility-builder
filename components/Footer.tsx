@@ -21,13 +21,29 @@ export default function Footer() {
               이미지, PDF, 문서 변환을 한 번에 해결하세요.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a 
+                href="https://twitter.com/shtools" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Twitter"
+              >
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a 
+                href="https://github.com/shtools" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="GitHub"
+              >
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a 
+                href="mailto:support@shtools.com" 
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="이메일"
+              >
                 <Mail className="w-5 h-5" />
               </a>
             </div>

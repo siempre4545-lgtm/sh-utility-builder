@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+export const runtime = 'nodejs'
+
 // Stripe는 환경변수가 있을 때만 초기화
 let stripe: any = null
 if (process.env.STRIPE_SECRET_KEY) {
@@ -74,10 +76,17 @@ export async function POST(request: NextRequest) {
 
     console.log('🔧 Stripe session config:', JSON.stringify(sessionConfig, null, 2))
 
-    const session = await stripe.checkout.sessions.create(sessionConfig)
+    // Stripe 세션 생성 시도
+    let session
+    try {
+      session = await stripe.checkout.sessions.create(sessionConfig)
+      console.log('✅ Stripe session created successfully:', session.id)
+      console.log('🔗 Session URL:', session.url)
+    } catch (stripeError) {
+      console.error('❌ Stripe API error:', stripeError)
+      throw stripeError
+    }
 
-    console.log('✅ Stripe session created successfully:', session.id)
-    console.log('🔗 Session URL:', session.url)
     return NextResponse.json({ sessionId: session.id })
   } catch (error) {
     console.error('❌ Stripe checkout session creation error:', error)

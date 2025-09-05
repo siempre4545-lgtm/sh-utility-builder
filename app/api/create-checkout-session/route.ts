@@ -71,7 +71,8 @@ export async function POST(request: NextRequest) {
       },
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
-      customer_creation: 'always',
+      // customer_creation은 subscription 모드에서 사용할 수 없음
+      // subscription 모드에서는 자동으로 고객이 생성됨
     }
 
     console.log('🔧 Stripe session config:', JSON.stringify(sessionConfig, null, 2))

@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 import Stripe from 'stripe'
 
 // Stripe 초기화
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
+  apiVersion: '2024-06-20',
 })
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
+
+// Idempotency 처리를 위한 메모리 캐시 (실제 환경에서는 Redis 사용 권장)
+const processedEvents = new Set<string>()
 
 export async function POST(request: NextRequest) {
   const body = await request.text()
@@ -20,6 +25,16 @@ export async function POST(request: NextRequest) {
     console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
+
+  // Idempotency 처리 - 같은 이벤트 중복 처리 방지
+  const eventId = event.id
+  if (processedEvents.has(eventId)) {
+    console.log(`Event ${eventId} already processed, skipping`)
+    return NextResponse.json({ received: true })
+  }
+
+  // 이벤트 ID를 처리된 목록에 추가
+  processedEvents.add(eventId)
 
   // 이벤트 타입별 처리
   switch (event.type) {

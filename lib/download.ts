@@ -123,7 +123,7 @@ export const downloadWithProgress = async (
     throw new Error('응답 스트림을 읽을 수 없습니다')
   }
 
-  const chunks: Uint8Array[] = []
+  const chunks: BlobPart[] = []
   let received = 0
 
   try {

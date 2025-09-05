@@ -109,20 +109,49 @@ export default function WebpToJpgPage() {
           device: 'mobile'
         })
       } else {
-        // 데스크톱: ZIP 파일로 다운로드
+        // 데스크톱: 파일 개수에 따라 다운로드 방식 결정
         const blob = await response.blob()
         
-        // ZIP 파일 다운로드
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `webp_converted_${Date.now()}.zip`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        window.URL.revokeObjectURL(url)
-        
-        toast.success('WebP 파일이 JPG로 변환되어 ZIP 파일로 다운로드되었습니다.')
+        if (files.length === 1) {
+          // 파일 1개: JPG 파일로 직접 다운로드
+          const zip = new (await import('jszip')).default()
+          const zipData = await zip.loadAsync(blob)
+          
+          // ZIP에서 첫 번째 파일 추출
+          const firstFile = Object.values(zipData.files).find(file => !file.dir)
+          if (firstFile) {
+            const content = await firstFile.async('blob')
+            
+            // 원본 파일명에서 확장자를 JPG로 변경
+            const originalName = files[0].name
+            const baseName = originalName.replace(/\.[^/.]+$/, '')
+            const jpgFilename = `${baseName}.jpg`
+            
+            // JPG 파일로 다운로드
+            const url = window.URL.createObjectURL(content)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = jpgFilename
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(url)
+            
+            toast.success('WebP 파일이 JPG로 변환되어 다운로드되었습니다!')
+          }
+        } else {
+          // 파일 2개 이상: ZIP 파일로 다운로드
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `webp_converted_${Date.now()}.zip`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          window.URL.revokeObjectURL(url)
+          
+          toast.success(`${files.length}개 WebP 파일이 JPG로 변환되어 ZIP 파일로 다운로드되었습니다!`)
+        }
         
         // GA4 이벤트 추적 (데스크톱)
         trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
@@ -339,6 +368,23 @@ export default function WebpToJpgPage() {
                             </>
                           )}
                         </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* PC 다운로드 안내 */}
+                  {!isMobile() && (
+                    <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 shadow-sm">
+                      <div className="text-center py-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <Download className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <p className="text-sm font-medium text-blue-800 mb-1">
+                          💻 PC 최적화 다운로드
+                        </p>
+                        <p className="text-xs text-blue-600">
+                          파일 1개: JPG 직접 다운로드 | 파일 2개 이상: ZIP 파일로 다운로드
+                        </p>
                       </div>
                     </div>
                   )}

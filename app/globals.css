@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* AdSense 자동광고 충돌 방지 */
+.adsense-exclude {
+  /* AdSense 자동광고가 이 영역을 피하도록 설정 */
+  position: relative;
+  z-index: 10;
+}
+
+/* AdSense 자동광고 영역 제한 */
+ins.adsbygoogle {
+  /* 자동광고가 특정 영역에서만 표시되도록 제한 */
+  display: block !important;
+  margin: 0 auto;
+}
+
+/* 수동 광고 영역과 자동광고 영역 분리 */
+.ad-manual {
+  position: relative;
+  z-index: 5;
+  /* 자동광고가 이 영역을 피하도록 설정 */
+  isolation: isolate;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {

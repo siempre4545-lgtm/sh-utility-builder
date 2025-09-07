@@ -14,10 +14,10 @@ interface ProModalProps {
 export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   
-  // 캐시 버스팅을 위한 빌드 타임 추가
+  // 캐시 버스팅을 위한 빌드 타임 추가 (한 번만 실행)
   useEffect(() => {
-    // 컴포넌트 마운트 시 캐시 클리어
-    if (typeof window !== 'undefined') {
+    // 컴포넌트 마운트 시 캐시 클리어 (한 번만 실행)
+    if (typeof window !== 'undefined' && !sessionStorage.getItem('pro_modal_cache_cleared')) {
       // 브라우저 캐시 무효화
       const timestamp = Date.now()
       const url = new URL(window.location.href)
@@ -25,6 +25,7 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
       
       // 히스토리 API를 사용하여 URL 업데이트 (페이지 리로드 없이)
       window.history.replaceState({}, '', url.toString())
+      sessionStorage.setItem('pro_modal_cache_cleared', 'true')
     }
   }, [])
   

@@ -3,9 +3,9 @@ const nextConfig = {
   // 성능 최적화
   poweredByHeader: false,
   
-  // 캐싱 완전 비활성화
-  generateEtags: false,
-  compress: false, // 압축도 비활성화하여 캐싱 방지
+  // 캐싱 최적화 (무한 로딩 방지)
+  generateEtags: true,
+  compress: true, // 압축 활성화
   
   // 이미지 최적화
   images: {
@@ -62,15 +62,7 @@ const nextConfig = {
           },
           {
             key: 'Cache-Control',
-            value: 'no-cache, no-store, must-revalidate, max-age=0',
-          },
-          {
-            key: 'Pragma',
-            value: 'no-cache',
-          },
-          {
-            key: 'Expires',
-            value: '0',
+            value: 'public, max-age=300, s-maxage=300, stale-while-revalidate=60',
           },
         ],
       },

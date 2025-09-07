@@ -95,27 +95,24 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Service Worker 제거
-              if ('serviceWorker' in navigator) {
+              // Service Worker 제거 (한 번만 실행)
+              if ('serviceWorker' in navigator && !sessionStorage.getItem('sw_cleared')) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
                   for(let registration of registrations) {
                     registration.unregister();
                   }
+                  sessionStorage.setItem('sw_cleared', 'true');
                 });
               }
               
-              // 캐시 클리어
-              if ('caches' in window) {
+              // 캐시 클리어 (한 번만 실행)
+              if ('caches' in window && !sessionStorage.getItem('cache_cleared')) {
                 caches.keys().then(function(names) {
                   for (let name of names) {
                     caches.delete(name);
                   }
+                  sessionStorage.setItem('cache_cleared', 'true');
                 });
-              }
-              
-              // 페이지 로드 시 캐시 방지
-              if (window.performance && window.performance.navigation.type === 1) {
-                window.location.reload(true);
               }
             `,
           }}

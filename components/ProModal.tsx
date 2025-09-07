@@ -17,49 +17,16 @@ interface ProModalProps {
 export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   
-  // Edge 브라우저 전용 캐시 버스팅
+  // 간단한 캐시 버스팅 (한 번만 실행)
   useEffect(() => {
     if (isOpen && typeof window !== 'undefined') {
       console.log('🔄 ProModal 열림 - LemonSqueezy 버전:', BUILD_TIME)
       
-      // Edge 브라우저 감지
-      const isEdge = /Edg/.test(navigator.userAgent)
-      console.log('🌐 브라우저 감지:', isEdge ? 'Edge' : 'Other')
-      
-      if (isEdge) {
-        // Edge 전용 캐시 버스팅
-        const timestamp = Date.now()
+      // URL에 캐시 버스팅 파라미터 추가 (한 번만)
+      if (!window.location.search.includes('_t=')) {
         const url = new URL(window.location.href)
-        
-        // Edge는 더 강력한 캐시 버스팅 필요
-        url.searchParams.set('_t', timestamp.toString())
-        url.searchParams.set('_edge', '1')
-        url.searchParams.set('_v', BUILD_TIME)
-        
-        // Edge에서는 더 강력한 캐시 무효화
-        if (window.location.search !== url.search) {
-          // Edge 전용: 강제 새로고침
-          window.location.href = url.toString()
-          return
-        }
-        
-        // Edge 전용: 추가 캐시 클리어
-        if ('caches' in window) {
-          caches.keys().then(names => {
-            names.forEach(name => {
-              if (name.includes('edge') || name.includes('pro-modal')) {
-                caches.delete(name)
-              }
-            })
-          })
-        }
-      } else {
-        // 다른 브라우저는 기존 방식
-        if (!window.location.search.includes('_t=')) {
-          const url = new URL(window.location.href)
-          url.searchParams.set('_t', BUILD_TIME)
-          window.history.replaceState({}, '', url.toString())
-        }
+        url.searchParams.set('_t', BUILD_TIME)
+        window.history.replaceState({}, '', url.toString())
       }
     }
   }, [isOpen])

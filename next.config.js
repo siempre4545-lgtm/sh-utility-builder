@@ -61,14 +61,6 @@ const nextConfig = {
             value: 'origin-when-cross-origin',
           },
           {
-            key: 'X-Edge-Cache',
-            value: 'no-cache',
-          },
-          {
-            key: 'X-UA-Compatible',
-            value: 'IE=edge,chrome=1',
-          },
-          {
             key: 'Cache-Control',
             value: 'public, max-age=300, s-maxage=300, stale-while-revalidate=60',
           },

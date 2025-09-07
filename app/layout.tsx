@@ -19,9 +19,6 @@ export const metadata: Metadata = {
   // 캐싱 방지 메타 태그
   other: {
     'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60',
-    // Edge 브라우저 전용 캐시 방지
-    'X-Edge-Cache': 'no-cache',
-    'X-UA-Compatible': 'IE=edge,chrome=1',
   },
   verification: {
     google: 'D5PCytY_76rKdtOt_RhpCj_Yx5HnmYFTBe43IZOyUhc',
@@ -96,9 +93,6 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Edge 브라우저 감지
-              const isEdge = /Edg/.test(navigator.userAgent);
-              
               // Service Worker 제거 (한 번만 실행)
               if ('serviceWorker' in navigator && !sessionStorage.getItem('sw_cleared')) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -117,19 +111,6 @@ export default function RootLayout({
                   }
                   sessionStorage.setItem('cache_cleared', 'true');
                 });
-              }
-              
-              // Edge 전용 추가 캐시 클리어
-              if (isEdge && !sessionStorage.getItem('edge_cache_cleared')) {
-                // Edge의 특별한 캐시 정책에 대응
-                if ('indexedDB' in window) {
-                  indexedDB.databases().then(databases => {
-                    databases.forEach(db => {
-                      indexedDB.deleteDatabase(db.name);
-                    });
-                  });
-                }
-                sessionStorage.setItem('edge_cache_cleared', 'true');
               }
             `,
           }}

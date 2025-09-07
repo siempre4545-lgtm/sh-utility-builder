@@ -183,16 +183,16 @@ export default function WebpToJpgPage() {
   return (
     <>
       <Head>
-        <title>무료 WebP JPG 변환기 - Google WebP를 JPG로 변환 | SH Tools</title>
-        <meta name="description" content="무료로 Google WebP 이미지를 JPG로 변환하세요. 호환성 향상, 압축 최적화, 메타데이터 보존. WebP 파일을 널리 호환되는 JPG 형식으로 변환하는 온라인 도구." />
+        <title>WebP→JPG 변환 - SH Tools</title>
+        <meta name="description" content="WebP 이미지를 JPG로 일괄 변환. 품질 유지." />
         <meta name="keywords" content="WebP JPG 변환, WebP 변환기, 무료 WebP 변환, WebP to JPG, Google WebP 변환, 온라인 WebP 변환, WebP JPG 변환기" />
-        <meta property="og:title" content="무료 WebP JPG 변환기 - Google WebP를 JPG로 변환" />
-        <meta property="og:description" content="무료로 Google WebP 이미지를 JPG로 변환하세요. 호환성 향상, 압축 최적화, 메타데이터 보존." />
-        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/webp-to-jpg" />
+        <meta property="og:title" content="WebP→JPG 변환 - SH Tools" />
+        <meta property="og:description" content="WebP 이미지를 JPG로 일괄 변환. 품질 유지." />
+        <meta property="og:url" content="https://sh-utility-builder.vercel.app/tools/webp-to-jpg" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="무료 WebP JPG 변환기" />
-        <meta name="twitter:description" content="무료로 Google WebP 이미지를 JPG로 변환하세요. 호환성 향상, 압축 최적화, 메타데이터 보존." />
+        <meta name="twitter:title" content="WebP→JPG 변환 - SH Tools" />
+        <meta name="twitter:description" content="WebP 이미지를 JPG로 일괄 변환. 품질 유지." />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">

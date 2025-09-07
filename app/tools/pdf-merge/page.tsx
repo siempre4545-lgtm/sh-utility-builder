@@ -92,16 +92,16 @@ export default function PdfMergePage() {
   return (
     <>
       <Head>
-        <title>무료 PDF 병합 도구 - 여러 PDF 파일을 하나로 합치기 | SH Tools</title>
-        <meta name="description" content="무료로 여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력. PDF 파일을 쉽고 빠르게 합치는 온라인 도구." />
+        <title>PDF 병합 - SH Tools</title>
+        <meta name="description" content="여러 PDF를 한 파일로 병합. 순서 변경, 빠른 처리." />
         <meta name="keywords" content="PDF 병합, 무료 PDF 합치기, PDF 파일 합치기, PDF 병합 도구, 온라인 PDF 병합, PDF 합치기 무료" />
-        <meta property="og:title" content="무료 PDF 병합 도구 - 여러 PDF 파일을 하나로 합치기" />
-        <meta property="og:description" content="무료로 여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력." />
-        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/pdf-merge" />
+        <meta property="og:title" content="PDF 병합 - SH Tools" />
+        <meta property="og:description" content="여러 PDF를 한 파일로 병합. 순서 변경, 빠른 처리." />
+        <meta property="og:url" content="https://sh-utility-builder.vercel.app/tools/pdf-merge" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="무료 PDF 병합 도구" />
-        <meta name="twitter:description" content="무료로 여러 PDF 파일을 하나로 병합하세요. 순서 조정, 빠른 병합, 고품질 출력." />
+        <meta name="twitter:title" content="PDF 병합 - SH Tools" />
+        <meta name="twitter:description" content="여러 PDF를 한 파일로 병합. 순서 변경, 빠른 처리." />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">

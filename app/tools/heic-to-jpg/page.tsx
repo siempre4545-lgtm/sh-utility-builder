@@ -126,16 +126,16 @@ export default function HeicToJpgPage() {
   return (
     <>
       <Head>
-        <title>무료 HEIC JPG 변환기 - iPhone 사진 변환 도구 | SH Tools</title>
-        <meta name="description" content="무료로 iPhone HEIC 사진을 JPG로 변환하세요. 고품질 변환, 빠른 처리, 메타데이터 보존. iPhone, iPad 사진을 널리 호환되는 JPG 형식으로 변환하는 온라인 도구." />
+        <title>HEIC→JPG 변환 - SH Tools</title>
+        <meta name="description" content="아이폰 HEIC 사진을 JPG로 간편 변환." />
         <meta name="keywords" content="HEIC JPG 변환, iPhone 사진 변환, HEIC 변환기, 무료 HEIC 변환, iPhone 사진 JPG, HEIC to JPG, 온라인 HEIC 변환" />
-        <meta property="og:title" content="무료 HEIC JPG 변환기 - iPhone 사진 변환 도구" />
-        <meta property="og:description" content="무료로 iPhone HEIC 사진을 JPG로 변환하세요. 고품질 변환, 빠른 처리, 메타데이터 보존." />
-        <meta property="og:url" content="https://sh-utility-builder-dn13.vercel.app/tools/heic-to-jpg" />
+        <meta property="og:title" content="HEIC→JPG 변환 - SH Tools" />
+        <meta property="og:description" content="아이폰 HEIC 사진을 JPG로 간편 변환." />
+        <meta property="og:url" content="https://sh-utility-builder.vercel.app/tools/heic-to-jpg" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="무료 HEIC JPG 변환기" />
-        <meta name="twitter:description" content="무료로 iPhone HEIC 사진을 JPG로 변환하세요. 고품질 변환, 빠른 처리, 메타데이터 보존." />
+        <meta name="twitter:title" content="HEIC→JPG 변환 - SH Tools" />
+        <meta name="twitter:description" content="아이폰 HEIC 사진을 JPG로 간편 변환." />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-12">

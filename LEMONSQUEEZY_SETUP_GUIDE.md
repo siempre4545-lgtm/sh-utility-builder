@@ -60,20 +60,37 @@
    NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/def456
    ```
 
-## 4. 웹훅 설정 (선택사항)
+## 4. 웹훅 설정
 
 ### 4.1 웹훅 URL 설정
-```
-https://sh-utility-builder.vercel.app/api/webhooks/lemonsqueezy
-```
+1. LemonSqueezy 대시보드 → Settings → Webhooks
+2. "Create Webhook" 클릭
+3. 웹훅 URL 입력:
+   ```
+   https://sh-utility-builder.vercel.app/api/webhooks/lemonsqueezy
+   ```
 
 ### 4.2 웹훅 이벤트 선택
-- `order_created`
-- `subscription_created`
-- `subscription_updated`
-- `subscription_cancelled`
-- `subscription_resumed`
-- `subscription_expired`
+다음 이벤트들을 선택:
+- ✅ `order_created` - 주문 생성 시
+- ✅ `subscription_created` - 구독 생성 시
+- ✅ `subscription_updated` - 구독 업데이트 시
+- ✅ `subscription_cancelled` - 구독 취소 시
+- ✅ `subscription_resumed` - 구독 재개 시
+- ✅ `subscription_expired` - 구독 만료 시
+
+### 4.3 웹훅 시크릿 설정
+1. 웹훅 생성 후 "Webhook Secret" 복사
+2. `.env.local`에 추가:
+   ```
+   LEMONSQUEEZY_WEBHOOK_SECRET=whsec_실제시크릿값
+   ```
+3. Vercel 환경 변수에도 동일하게 추가
+
+### 4.4 웹훅 테스트
+1. 웹훅 생성 후 "Test Webhook" 클릭
+2. 테스트 이벤트가 정상적으로 수신되는지 확인
+3. Vercel 로그에서 웹훅 처리 로그 확인
 
 ## 5. 결제 방법 설정
 

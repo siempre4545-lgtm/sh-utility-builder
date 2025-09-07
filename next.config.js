@@ -129,15 +129,6 @@ const nextConfig = {
     ]
   },
 
-  // 정적 파일 서빙 설정 (네이버 웹마스터 HTML 파일용)
-  async rewrites() {
-    return [
-      {
-        source: '/naverc1eca6936314e69c28400af9f0546331.html',
-        destination: '/naverc1eca6936314e69c28400af9f0546331.html',
-      },
-    ]
-  },
 
   // 캐시 버스팅을 위한 환경 변수
   env: {

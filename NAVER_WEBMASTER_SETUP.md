@@ -13,29 +13,29 @@
 
 ### 3. 사이트 소유확인 방법
 
-#### 방법 1: HTML 파일 업로드 (권장)
+#### 방법 1: 메타 태그 (권장) ✅
+1. **메타 태그 복사**: 네이버에서 제공하는 메타 태그 복사
+2. **HTML 추가**: `app/layout.tsx`에 메타 태그 추가
+3. **배포**: Vercel에 배포
+4. **확인**: 네이버에서 "확인" 버튼 클릭
+
+#### 방법 2: HTML 파일 업로드 (대안)
 1. **HTML 파일 다운로드**: 네이버에서 제공하는 HTML 파일 다운로드
 2. **파일 업로드**: `public/` 폴더에 HTML 파일 업로드
 3. **파일 내용 확인**: 올바른 HTML 형식으로 작성
 4. **배포**: Vercel에 배포
 5. **확인**: 네이버에서 "확인" 버튼 클릭
 
-#### 방법 2: 메타 태그 (대안)
-1. **메타 태그 복사**: 네이버에서 제공하는 메타 태그 복사
-2. **HTML 추가**: `app/layout.tsx`에 메타 태그 추가
-3. **배포**: Vercel에 배포
-4. **확인**: 네이버에서 "확인" 버튼 클릭
-
 ### 4. 현재 설정 상태
 
-#### HTML 파일 방식
-- **파일 경로**: `/public/naverc1eca6936314e69c28400af9f0546331.html`
-- **접근 URL**: `https://sh-utility-builder.vercel.app/naverc1eca6936314e69c28400af9f0546331.html`
-- **파일 내용**: 완전한 HTML 문서 형식
-
-#### 메타 태그 방식 (백업)
+#### 메타 태그 방식 (활성) ✅
 - **위치**: `app/layout.tsx`의 `verification.other` 섹션
-- **메타 태그**: `<meta name="naver-site-verification" content="naverc1eca6936314e69c28400af9f0546331" />`
+- **메타 태그**: `<meta name="naver-site-verification" content="c51fc9864b7f6355bb7ec5f67c10d4933ce6e230" />`
+- **적용 범위**: 모든 페이지의 `<head>` 섹션에 자동 포함
+
+#### HTML 파일 방식 (비활성)
+- **상태**: 삭제됨 (메타 태그 방식으로 변경)
+- **이유**: 네이버 검색로봇 접근 문제로 메타 태그 방식 사용
 
 ### 5. 문제 해결
 
@@ -58,16 +58,16 @@
 
 ### 6. 확인 절차
 
-#### 1단계: 파일 접근 테스트
-```bash
-# 브라우저에서 직접 접근 테스트
-https://sh-utility-builder.vercel.app/naverc1eca6936314e69c28400af9f0546331.html
-```
-
-#### 2단계: 메타 태그 확인
+#### 1단계: 메타 태그 확인
 ```bash
 # 페이지 소스에서 메타 태그 확인
 curl -s https://sh-utility-builder.vercel.app/ | grep "naver-site-verification"
+```
+
+#### 2단계: 브라우저에서 확인
+```bash
+# 브라우저 개발자 도구 → Elements 탭에서 <head> 섹션 확인
+# 또는 페이지 소스 보기에서 메타 태그 확인
 ```
 
 #### 3단계: 네이버 웹마스터에서 확인

@@ -7,6 +7,7 @@ const path = require('path');
 const siteUrl = 'https://sh-utility-builder.vercel.app';
 const currentDate = new Date().toISOString();
 const buildTime = Date.now().toString();
+const uniqueId = Math.random().toString(36).substring(2, 15);
 
 // 사이트맵에 포함할 페이지들
 const pages = [
@@ -89,6 +90,8 @@ function generateSitemap() {
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated at: ${currentDate} -->
 <!-- Build time: ${buildTime} -->
+<!-- Unique ID: ${uniqueId} -->
+<!-- Domain: ${siteUrl} -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
   pages.forEach(page => {

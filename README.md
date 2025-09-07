@@ -4,17 +4,21 @@
 
 ## 🚀 주요 기능
 
-- **이미지 리사이즈**: JPEG, PNG, WebP 크기 조정
-- **HEIC → JPG 변환**: iPhone 사진 호환성 향상
-- **PDF 병합**: 여러 PDF를 하나로 병합
-- **WebP → JPG 변환**: Google WebP 호환성 향상
+- **이미지 리사이즈**: JPEG, PNG, WebP 크기 조정 및 품질 최적화
+- **HEIC → JPG 변환**: iPhone 사진을 널리 호환되는 JPG로 변환
+- **PDF 병합**: 여러 PDF를 하나로 병합하여 관리
+- **WebP → JPG 변환**: Google WebP를 호환성 높은 JPG로 변환
+- **QR 코드 생성**: 텍스트, URL, 연락처 정보를 QR 코드로 생성
+- **SRT 자막 편집**: 자막 파일 편집 및 시간 동기화
 
 ## 🛠 기술 스택
 
 - **Frontend**: Next.js 14 App Router, React 18, TypeScript
 - **Styling**: Tailwind CSS v4, Framer Motion
 - **UI Components**: Lucide React, Sonner
-- **Analytics**: Vercel Analytics, Google Analytics
+- **Analytics**: Vercel Analytics, Google Analytics 4
+- **Payment**: LemonSqueezy (구독 결제)
+- **Ads**: Google AdSense
 - **Deployment**: Vercel
 
 ## 📦 설치 및 실행
@@ -44,13 +48,10 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 # Google AdSense
 NEXT_PUBLIC_ADSENSE_ID=ca-pub-xxxxxxxxxx
 
-# Stripe (결제 시스템)
-STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxx
-STRIPE_SECRET_KEY=sk_test_xxxxxxxxxx
-
-# 포트원 (결제 시스템)
-PORTONE_API_KEY=xxxxxxxxxx
-PORTONE_SECRET_KEY=xxxxxxxxxx
+# LemonSqueezy (결제 시스템)
+NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/xxxxxxxxxx
+NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/xxxxxxxxxx
+LEMONSQUEEZY_WEBHOOK_SECRET=whsec_xxxxxxxxxx
 
 # 기타
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
@@ -91,9 +92,10 @@ npm start
 ## 💰 수익화 시스템
 
 ### Pro 구독
-- 월간 플랜: ₩9,900/월
-- 연간 플랜: ₩99,000/년 (17% 할인)
-- Stripe 또는 포트원 결제 연동 준비
+- 월간 플랜: ₩7,900/월
+- 연간 플랜: ₩79,000/년 (2개월 무료!)
+- LemonSqueezy 결제 시스템 연동
+- 신용카드, PayPal, Apple Pay, Google Pay 지원
 
 ### 광고 시스템
 - Google AdSense 준비

@@ -1,5 +1,0 @@
-[33m2350a82[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m feat: ProModal 결제 UI 단순화 - Stripe 카드 결제만 지원
-[33m453af74[m Next.js 빌드 오류 수정: useSearchParams Suspense boundary 및 SRT MIME 타입 설정
-[33m8b70247[m 강제 재배포: sh-utility-builder.vercel.app에 최신 코드 적용
-[33m86b4bc2[m TypeScript 타입 오류 수정: downloadWithProgress 함수의 Uint8Array 타입 문제 해결
-[33mc187bb6[m Stripe Webhook 엔드포인트 추가 - 결제 완료 처리 및 구독 관리

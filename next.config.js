@@ -17,6 +17,11 @@ const nextConfig = {
   // 실험적 기능
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+    // 성능 최적화
+    optimizeCss: true,
+    optimizeServerReact: true,
+    // 번들 분석
+    bundlePagesRouterDependencies: true,
   },
 
   // 웹팩 최적화

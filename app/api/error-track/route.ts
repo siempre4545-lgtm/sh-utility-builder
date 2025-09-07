@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { slackNotifier } from '@/lib/slack-notifications'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,50 +18,16 @@ export async function POST(request: NextRequest) {
       timestamp: errorData.timestamp
     })
 
-    // Slack 알림 (선택사항)
-    if (process.env.SLACK_WEBHOOK_URL) {
-      const slackMessage = {
-        text: '🚨 SH Tools API Error',
-        blocks: [
-          {
-            type: 'header',
-            text: {
-              type: 'plain_text',
-              text: '🚨 API Error Report',
-            },
-          },
-          {
-            type: 'section',
-            fields: [
-              {
-                type: 'mrkdwn',
-                text: `*Error:*\n${errorData.message}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*Endpoint:*\n${errorData.apiEndpoint || 'Unknown'}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*Files:*\n${errorData.fileCount || 0} files, ${errorData.totalSize ? (errorData.totalSize / 1024 / 1024).toFixed(2) + 'MB' : 'Unknown size'}`,
-              },
-              {
-                type: 'mrkdwn',
-                text: `*Pro User:*\n${errorData.isPro ? 'Yes' : 'No'}`,
-              },
-            ],
-          },
-        ],
-      }
-
-      await fetch(process.env.SLACK_WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(slackMessage),
-      })
-    }
+    // Slack 알림 전송
+    await slackNotifier.sendErrorNotification({
+      error: errorData.message,
+      stack: errorData.stack,
+      url: errorData.url,
+      userAgent: errorData.userAgent,
+      timestamp: errorData.timestamp || new Date().toISOString(),
+      userId: errorData.userId,
+      sessionId: errorData.sessionId
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

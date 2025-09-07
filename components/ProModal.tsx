@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { X, Check, Zap, Shield, Clock, Star, CreditCard } from 'lucide-react'
 import { trackProUpgrade } from '@/components/GoogleAnalytics'
-import { createCheckoutSession } from '@/lib/stripe'
 
 interface ProModalProps {
   isOpen: boolean
@@ -37,60 +36,34 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
       // 이벤트 추적
       trackProUpgrade(`modal_${planType}`)
       
-      // 환경 변수 확인
-      const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-      if (!publishableKey) {
-        throw new Error('Stripe 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.')
+      // LemonSqueezy Buy Link 가져오기
+      const buyLink = planType === 'monthly' 
+        ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_BUY_LINK
+        : process.env.NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK
+      
+      if (!buyLink) {
+        throw new Error('LemonSqueezy 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.')
       }
       
-      // Stripe Price ID 설정 (실제 Stripe 대시보드에서 생성된 ID 사용)
-      const priceId = planType === 'monthly' 
-        ? process.env.NEXT_PUBLIC_STRIPE_MONTHLY_PRICE_ID || 'price_monthly_placeholder'
-        : process.env.NEXT_PUBLIC_STRIPE_YEARLY_PRICE_ID || 'price_yearly_placeholder'
-      
-      // Price ID가 placeholder인지 확인
-      if (priceId.includes('placeholder')) {
+      // Buy Link가 placeholder인지 확인
+      if (buyLink.includes('xxxxxxxxxx')) {
         throw new Error('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
       }
       
-      // 결제 세션 생성
-      console.log('🔄 Creating checkout session for price:', priceId)
-      const session = await createCheckoutSession(priceId)
-      console.log('📝 Session response:', session)
+      console.log('🔄 Redirecting to LemonSqueezy checkout:', buyLink)
       
-      if (session.sessionId) {
-        // Stripe Checkout으로 리다이렉트
-        console.log('🔄 Loading Stripe...')
-        const stripe = await import('@stripe/stripe-js').then(m => m.loadStripe(publishableKey))
-        if (stripe) {
-          console.log('🔄 Redirecting to Stripe Checkout...')
-          const { error } = await stripe.redirectToCheckout({ sessionId: session.sessionId })
-          if (error) {
-            console.error('❌ Stripe redirect error:', error)
-            alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`)
-          }
-        } else {
-          throw new Error('Stripe 초기화에 실패했습니다.')
-        }
-      } else {
-        // API 응답에서 오류 메시지 확인
-        const errorMessage = session.error || '결제 세션 생성에 실패했습니다.'
-        console.error('❌ Session creation failed:', errorMessage)
-        throw new Error(errorMessage)
-      }
+      // LemonSqueezy Buy Link로 리다이렉트
+      window.open(buyLink, '_blank')
+      
     } catch (error) {
       console.error('❌ Payment error:', error)
       const errorMessage = error instanceof Error ? error.message : '결제 처리 중 오류가 발생했습니다.'
       
       // 더 자세한 오류 메시지 표시
-      if (errorMessage.includes('Stripe not configured')) {
+      if (errorMessage.includes('LemonSqueezy not configured')) {
         alert('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
       } else if (errorMessage.includes('Payment system not yet configured')) {
         alert('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
-      } else if (errorMessage.includes('Invalid price configuration')) {
-        alert('결제 설정에 문제가 있습니다. 관리자에게 문의해주세요.')
-      } else if (errorMessage.includes('Payment system configuration error')) {
-        alert('결제 시스템 설정에 오류가 있습니다. 관리자에게 문의해주세요.')
       } else {
         alert(`결제 처리 중 오류가 발생했습니다: ${errorMessage}`)
       }
@@ -240,14 +213,14 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
                   <CreditCard className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-green-800">신용카드 결제</h3>
-                  <p className="text-sm text-green-600">Stripe를 통한 안전한 결제</p>
+                  <h3 className="text-lg font-semibold text-green-800">다양한 결제 방법</h3>
+                  <p className="text-sm text-green-600">LemonSqueezy를 통한 안전한 결제</p>
                 </div>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-center space-x-2 text-sm text-gray-600">
               <Shield className="w-4 h-4" />
-              <span>SSL 암호화 • PCI DSS 준수 • 256비트 보안</span>
+              <span>신용카드 • PayPal • Apple Pay • Google Pay</span>
             </div>
           </div>
 
@@ -258,7 +231,7 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
               <div>
                 <h4 className="font-medium text-blue-900">안전한 결제 보장</h4>
                 <p className="text-sm text-blue-700 mt-1">
-                  Stripe의 엔터프라이즈급 보안으로 카드 정보를 안전하게 처리합니다.
+                  LemonSqueezy의 엔터프라이즈급 보안으로 결제 정보를 안전하게 처리합니다.
                 </p>
               </div>
             </div>

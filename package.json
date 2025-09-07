@@ -4,10 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next-sitemap",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "sitemap": "next-sitemap",
+    "build:sitemap": "next build && next-sitemap",
+    "test:sitemap": "node test-sitemap.js",
+    "generate:sitemap": "node generate-sitemap.js"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",

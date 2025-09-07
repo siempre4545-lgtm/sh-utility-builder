@@ -3,7 +3,11 @@ module.exports = {
   siteUrl: 'https://sh-utility-builder.vercel.app',
   generateRobotsTxt: true,
   generateIndexSitemap: false,
-  exclude: ['/api/*', '/admin/*'],
+  exclude: ['/api/*', '/admin/*', '/success', '/cancel'],
+  changefreq: 'daily',
+  priority: 0.7,
+  sitemapSize: 5000,
+  autoLastmod: true,
   additionalPaths: async (config) => {
     const result = []
 
@@ -69,12 +73,23 @@ module.exports = {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/admin/'],
+        disallow: ['/api/', '/admin/', '/success', '/cancel'],
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/api/', '/admin/', '/success', '/cancel'],
+      },
+      {
+        userAgent: 'Yeti', // 네이버 검색로봇
+        allow: '/',
+        disallow: ['/api/', '/admin/', '/success', '/cancel'],
       },
     ],
     additionalSitemaps: [
       'https://sh-utility-builder.vercel.app/sitemap.xml',
     ],
+    host: 'https://sh-utility-builder.vercel.app',
   },
   transform: async (config, path) => {
     // 특정 페이지별 우선순위 조정

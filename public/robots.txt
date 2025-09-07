@@ -3,6 +3,24 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /admin/
+Disallow: /success
+Disallow: /cancel
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /success
+Disallow: /cancel
+
+# Yeti
+User-agent: Yeti
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /success
+Disallow: /cancel
 
 # Host
 Host: https://sh-utility-builder.vercel.app

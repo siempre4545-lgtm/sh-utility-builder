@@ -18,11 +18,7 @@ export const metadata: Metadata = {
   publisher: 'SH Tools',
   // 캐싱 방지 메타 태그
   other: {
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
-    'Pragma': 'no-cache',
-    'Expires': '0',
-    'Last-Modified': new Date().toUTCString(),
-    'ETag': `"${Date.now()}"`,
+    'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60',
   },
   verification: {
     google: 'D5PCytY_76rKdtOt_RhpCj_Yx5HnmYFTBe43IZOyUhc',

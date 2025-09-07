@@ -65,7 +65,6 @@ export default function Hero() {
       
       {/* Pro Modal */}
       <ProModal 
-        key={`hero-pro-modal-${isProModalOpen ? 'open' : 'closed'}`}
         isOpen={isProModalOpen} 
         onClose={() => setIsProModalOpen(false)}
         trigger="hero"

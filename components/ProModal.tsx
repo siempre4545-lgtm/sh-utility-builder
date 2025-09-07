@@ -16,32 +16,20 @@ interface ProModalProps {
 
 export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProModalProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [forceRender, setForceRender] = useState(0)
   
-  // 캐시 버스팅을 위한 강제 리렌더링
+  // 간단한 캐시 버스팅 (한 번만 실행)
   useEffect(() => {
-    if (isOpen) {
-      // 모달이 열릴 때마다 강제 리렌더링
-      setForceRender(prev => prev + 1)
+    if (isOpen && typeof window !== 'undefined') {
+      console.log('🔄 ProModal 열림 - LemonSqueezy 버전:', BUILD_TIME)
       
-      // 디버깅 로그
-      console.log('🔄 ProModal 열림 - LemonSqueezy 버전:', {
-        buildTime: BUILD_TIME,
-        forceRender: forceRender + 1,
-        timestamp: Date.now()
-      })
-      
-      // 브라우저 캐시 무효화 (모달 열릴 때마다)
-      if (typeof window !== 'undefined') {
-        const timestamp = Date.now()
+      // URL에 캐시 버스팅 파라미터 추가 (한 번만)
+      if (!window.location.search.includes('_t=')) {
         const url = new URL(window.location.href)
-        url.searchParams.set('_t', timestamp.toString())
-        
-        // 히스토리 API를 사용하여 URL 업데이트 (페이지 리로드 없이)
+        url.searchParams.set('_t', BUILD_TIME)
         window.history.replaceState({}, '', url.toString())
       }
     }
-  }, [isOpen, forceRender])
+  }, [isOpen])
   
   if (!isOpen) return null
 
@@ -129,10 +117,7 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
   ]
 
   return (
-    <div 
-      key={`pro-modal-${forceRender}-${BUILD_TIME}`}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50"
-    >
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">

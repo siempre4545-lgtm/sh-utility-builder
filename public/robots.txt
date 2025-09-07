@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Host
+Host: https://sh-utility-builder.vercel.app
+
+# Sitemaps
+Sitemap: https://sh-utility-builder.vercel.app/sitemap.xml

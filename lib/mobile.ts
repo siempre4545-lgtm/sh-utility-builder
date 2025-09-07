@@ -95,15 +95,7 @@ export const previewImage = (file: File): void => {
         </head>
         <body>
           <img src="${url}" alt="미리보기" />
-          <button class="download-btn" onclick="downloadImage()">다운로드</button>
-          <script>
-            function downloadImage() {
-              const link = document.createElement('a');
-              link.href = '${url}';
-              link.download = '${file.name}';
-              link.click();
-            }
-          </script>
+          <button class="download-btn" onclick="window.open('${url}', '_blank')">다운로드</button>
         </body>
       </html>
     `)

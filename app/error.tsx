@@ -1,5 +1,8 @@
 'use client'
 
+// 동적 렌더링 설정
+export const dynamic = 'force-dynamic'
+
 export default function Error({
   error,
   reset,

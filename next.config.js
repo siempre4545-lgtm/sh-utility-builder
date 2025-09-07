@@ -17,8 +17,7 @@ const nextConfig = {
   // 실험적 기능
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
-    // 성능 최적화
-    optimizeCss: true,
+    // 성능 최적화 (critters 오류 방지)
     optimizeServerReact: true,
     // 번들 분석
     bundlePagesRouterDependencies: true,
@@ -44,6 +43,15 @@ const nextConfig = {
         },
       }
     }
+    
+    // critters 관련 오류 방지
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+      os: false,
+    }
+    
     return config
   },
 

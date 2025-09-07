@@ -1,5 +1,9 @@
 import { MetadataRoute } from 'next'
 
+// 강제 캐시 버스팅을 위한 동적 설정
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://sh-utility-builder.vercel.app'
   const currentDate = new Date().toISOString()

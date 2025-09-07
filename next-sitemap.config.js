@@ -1,13 +1,15 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: 'https://sh-utility-builder.vercel.app',
-  generateRobotsTxt: true,
+  generateRobotsTxt: false, // 수동으로 생성하므로 비활성화
   generateIndexSitemap: false,
   exclude: ['/api/*', '/admin/*', '/success', '/cancel'],
   changefreq: 'daily',
   priority: 0.7,
   sitemapSize: 5000,
   autoLastmod: true,
+  // 사이트맵 자동 생성 완전 비활성화
+  generateSitemap: false,
   additionalPaths: async (config) => {
     const result = []
 

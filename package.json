@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap",
     "sitemap": "next-sitemap",
     "build:sitemap": "next build && next-sitemap",
     "test:sitemap": "node test-sitemap.js",

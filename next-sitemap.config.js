@@ -108,6 +108,11 @@ module.exports = {
       '/terms': 0.5,
     }
 
+    // script 태그나 잘못된 경로 제외
+    if (path.includes('<script') || path.includes('script>') || path.includes('</script>')) {
+      return null
+    }
+
     return {
       loc: path,
       changefreq: config.changefreq,

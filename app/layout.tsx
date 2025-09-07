@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/react'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -74,14 +75,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
-        {/* Google AdSense 코드 */}
-        <script 
-          async 
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1113623105565685"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body className={inter.className}>
         <Header />
         <main className="min-h-screen">
@@ -92,6 +85,12 @@ export default function RootLayout({
         <Analytics />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ''} />
         
+        {/* Google AdSense 코드 - next/script로 이동 */}
+        <Script
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1113623105565685"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
       </body>
     </html>
   )

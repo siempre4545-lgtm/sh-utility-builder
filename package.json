@@ -7,8 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sitemap": "next-sitemap",
-    "build:sitemap": "next build && next-sitemap",
     "test:sitemap": "node test-sitemap.js",
     "generate:sitemap": "node generate-sitemap.js"
   },

@@ -1,0 +1,5 @@
+[33m71f8154[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Fix ads.txt file access issue - regenerate file and add proper headers
+[33mdac81e1[m Add ads.txt file for Google AdSense verification
+[33m205d517[m fix: lib/mobile.ts에서 script 태그 완전 제거 - 사이트맵 오염 문제 근본 해결
+[33mea29a43[m fix: 사이트맵 강제 캐시 버스팅 적용 - dynamic 설정 및 캐시 헤더로 script 태그 완전 제거
+[33m3560298[m fix: AdSense 스크립트를 next/script로 이동하여 사이트맵에서 script 태그 완전 제거

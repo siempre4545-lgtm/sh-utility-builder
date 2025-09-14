@@ -138,7 +138,7 @@ export default function QrGeneratorPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
                 <span>QR 코드 설정</span>
                 <UsageCounter 
-                  current={dailyCount} 
+                  remaining={remainingGenerations} 
                   max={maxDailyGenerations} 
                   isPro={isPro} 
                   type="generations" 

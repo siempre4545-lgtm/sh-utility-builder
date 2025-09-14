@@ -12,10 +12,34 @@ export default function SubscriptionCancelPage() {
   const handleCancelSubscription = async () => {
     setIsLoading(true)
     try {
-      // LemonSqueezy 고객 포털로 리다이렉트
-      // 실제 구현에서는 사용자 이메일을 기반으로 포털 URL을 생성해야 함
-      const customerPortalUrl = 'https://sh-utility.lemonsqueezy.com/my-orders'
-      window.open(customerPortalUrl, '_blank')
+      // 실제 구독 취소 방법 안내
+      const cancelInstructions = `
+구독 취소 방법:
+
+1. 결제 확인 이메일 확인
+   - 결제 시 받은 LemonSqueezy 이메일을 찾으세요
+   - "Manage Subscription" 또는 "구독 관리" 링크 클릭
+
+2. LemonSqueezy 웹사이트 접속
+   - https://lemonsqueezy.com 접속
+   - 결제 시 사용한 이메일로 로그인
+
+3. 구독 관리 페이지에서
+   - "Cancel Subscription" 버튼 클릭
+   - 취소 사유 선택 (선택사항)
+   - "Confirm Cancellation" 클릭
+
+4. 취소 확인
+   - 취소 확인 이메일 수신
+   - 현재 결제 주기까지 Pro 기능 사용 가능
+
+문의사항이 있으시면 언제든지 연락해주세요.
+      `
+      
+      alert(cancelInstructions)
+      
+      // LemonSqueezy 메인 페이지로 이동
+      window.open('https://lemonsqueezy.com', '_blank')
     } catch (error) {
       console.error('구독 취소 페이지 오류:', error)
       alert('구독 취소 페이지로 이동하는 중 오류가 발생했습니다.')

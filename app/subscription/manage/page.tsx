@@ -37,8 +37,14 @@ function SubscriptionManageContent() {
 
   const handleManageSubscription = () => {
     // LemonSqueezy 고객 포털로 리다이렉트
+    // 실제 고객 포털 URL은 이메일로 전송된 링크를 사용해야 함
     const customerPortalUrl = 'https://sh-utility.lemonsqueezy.com/my-orders'
-    window.open(customerPortalUrl, '_blank')
+    
+    // 고객 포털 접근 안내
+    alert('LemonSqueezy 고객 포털에 접근하려면:\n\n1. 결제 확인 이메일을 확인하세요\n2. 이메일의 "Manage Subscription" 링크를 클릭하세요\n3. 또는 LemonSqueezy 웹사이트에서 로그인하세요\n\n고객 포털에서 구독 관리, 결제 방법 변경, 구독 취소가 가능합니다.')
+    
+    // 새 탭에서 LemonSqueezy 메인 페이지 열기
+    window.open('https://lemonsqueezy.com', '_blank')
   }
 
   const getStatusIcon = (status: string) => {

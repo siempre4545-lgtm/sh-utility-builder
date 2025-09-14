@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { CheckCircle, ArrowRight, Zap, Shield, Clock, Star } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
+import { setProStatus } from '@/lib/useProStatus'
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
@@ -15,6 +16,13 @@ function PaymentSuccessContent() {
     const planParam = searchParams.get('plan')
     if (planParam) {
       setPlan(planParam)
+      
+      // Pro 상태 설정
+      setProStatus({
+        isPro: true,
+        planType: planParam as 'monthly' | 'yearly',
+        expiresAt: new Date(Date.now() + (planParam === 'yearly' ? 365 : 30) * 24 * 60 * 60 * 1000).toISOString()
+      })
     }
     setIsLoading(false)
   }, [searchParams])

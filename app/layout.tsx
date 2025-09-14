@@ -8,7 +8,7 @@ import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/react'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Script from 'next/script'
-import ProStatusProvider from '@/components/ProStatusProvider'
+import { ProStatusProvider } from '@/components/ProStatusProvider'
 
 const inter = Inter({ subsets: ['latin'] })
 

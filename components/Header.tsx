@@ -39,6 +39,9 @@ export default function Header() {
             <Link href="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
               문의
             </Link>
+            <Link href="/subscription/manage" className="text-gray-600 hover:text-gray-900 transition-colors">
+              구독 관리
+            </Link>
             <Button variant="outline" size="sm" onClick={() => setIsProModalOpen(true)}>
               Pro 업그레이드
             </Button>
@@ -93,6 +96,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 문의
+              </Link>
+              <Link 
+                href="/subscription/manage" 
+                className="text-gray-600 hover:text-gray-900 transition-colors py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                구독 관리
               </Link>
               <Button 
                 variant="outline" 

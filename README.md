@@ -49,9 +49,9 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_ADSENSE_ID=ca-pub-xxxxxxxxxx
 
 # LemonSqueezy (결제 시스템)
-NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/xxxxxxxxxx
-NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/xxxxxxxxxx
-LEMONSQUEEZY_WEBHOOK_SECRET=whsec_xxxxxxxxxx
+NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/실제월간링크
+NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/실제연간링크
+LEMONSQUEEZY_WEBHOOK_SECRET=whsec_실제웹훅시크릿
 
 # 기타
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
@@ -63,6 +63,13 @@ npm run dev
 ```
 
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+
+### 5. LemonSqueezy 프로덕션 설정 (정식 승인 후)
+```bash
+npm run lemonsqueezy:setup
+```
+
+이 명령어는 LemonSqueezy 정식 승인 후 프로덕션 설정을 도와주는 가이드를 제공합니다.
 
 ## 🏗 빌드 및 배포
 

@@ -117,18 +117,46 @@
 - 테스트 모드에서 생성된 Buy Link 사용
 - 실제 결제는 발생하지 않음
 
-## 7. 프로덕션 배포
+## 7. 프로덕션 배포 (정식 승인 후)
 
-### 7.1 환경 변수 설정
-Vercel 대시보드에서 환경 변수 추가:
+### 7.1 LemonSqueezy 정식 승인 확인
+1. LemonSqueezy 대시보드에서 계정 상태 확인
+2. "Test Mode" 버튼이 비활성화 가능한 상태인지 확인
+3. 모든 제품이 "Live" 상태인지 확인
+
+### 7.2 프로덕션 Buy Link 생성
+1. **월간 플랜**:
+   - 제품 페이지에서 "Live" Buy Link 생성
+   - URL 예시: `https://shtools.lemonsqueezy.com/checkout/buy/실제월간링크`
+   
+2. **연간 플랜**:
+   - 제품 페이지에서 "Live" Buy Link 생성  
+   - URL 예시: `https://shtools.lemonsqueezy.com/checkout/buy/실제연간링크`
+
+### 7.3 프로덕션 웹훅 설정
+1. 기존 테스트 웹훅 삭제 또는 비활성화
+2. 새로운 프로덕션 웹훅 생성:
+   - URL: `https://sh-utility-builder.vercel.app/api/webhooks/lemonsqueezy`
+   - 이벤트: `order_created`, `subscription_created`, `subscription_updated`, `subscription_cancelled`, `subscription_resumed`, `subscription_expired`
+3. 웹훅 시크릿 복사 (예: `whsec_실제웹훅시크릿`)
+
+### 7.4 Vercel 환경 변수 업데이트
+Vercel 대시보드 → Project Settings → Environment Variables에서 업데이트:
 ```
 NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/실제월간링크
 NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK=https://shtools.lemonsqueezy.com/checkout/buy/실제연간링크
+LEMONSQUEEZY_WEBHOOK_SECRET=whsec_실제웹훅시크릿
 ```
 
-### 7.2 테스트 모드 비활성화
-- LemonSqueezy 대시보드에서 "Test Mode" 비활성화
-- 실제 결제 활성화
+### 7.5 테스트 모드 비활성화
+1. LemonSqueezy 대시보드에서 "Test Mode" 토글을 OFF로 변경
+2. 실제 결제가 활성화됨을 확인
+3. 프로덕션 Buy Link로 테스트 결제 진행
+
+### 7.6 배포 및 테스트
+1. Vercel에서 자동 배포 확인
+2. 프로덕션 사이트에서 결제 플로우 테스트
+3. 웹훅 이벤트 수신 확인
 
 ## 8. 모니터링 및 분석
 
@@ -170,12 +198,21 @@ NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK=https://shtools.lemonsqueezy.com/checko
 
 ## 빠른 시작 체크리스트
 
+### 테스트 단계
 - [ ] LemonSqueezy 계정 생성
 - [ ] 스토어 설정 완료
 - [ ] 월간/연간 제품 생성
-- [ ] Buy Link 생성 및 환경 변수 설정
+- [ ] 테스트 Buy Link 생성 및 환경 변수 설정
 - [ ] 테스트 결제 완료
-- [ ] 프로덕션 배포
+- [ ] 웹훅 테스트 완료
+
+### 프로덕션 단계 (정식 승인 후)
+- [ ] LemonSqueezy 정식 승인 확인
+- [ ] 프로덕션 Buy Link 생성
+- [ ] 프로덕션 웹훅 설정
+- [ ] Vercel 환경 변수 업데이트
+- [ ] 테스트 모드 비활성화
+- [ ] 프로덕션 결제 테스트
 - [ ] 모니터링 설정
 
 ## 문제 해결

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lemonsqueezy:setup": "node scripts/lemonsqueezy-production-setup.js"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.10",

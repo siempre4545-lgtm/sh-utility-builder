@@ -40,23 +40,32 @@ export default function ProModal({ isOpen, onClose, trigger = 'upgrade' }: ProMo
       trackProUpgrade(`modal_${planType}`)
       
       // LemonSqueezy Buy Link 가져오기
-      const buyLink = planType === 'monthly' 
+      const baseBuyLink = planType === 'monthly' 
         ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_MONTHLY_BUY_LINK
         : process.env.NEXT_PUBLIC_LEMONSQUEEZY_YEARLY_BUY_LINK
       
-      if (!buyLink) {
+      if (!baseBuyLink) {
         throw new Error('LemonSqueezy 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.')
       }
       
       // Buy Link가 placeholder인지 확인
-      if (buyLink.includes('xxxxxxxxxx')) {
+      if (baseBuyLink.includes('xxxxxxxxxx') || baseBuyLink.includes('실제')) {
         throw new Error('결제 시스템이 아직 설정되지 않았습니다. 잠시 후 다시 시도해주세요.')
       }
       
-      console.log('🔄 Redirecting to LemonSqueezy checkout:', buyLink)
+      // Success URL과 Cancel URL 추가
+      const successUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sh-utility-builder.vercel.app'}/payment/success?plan=${planType}`
+      const cancelUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://sh-utility-builder.vercel.app'}/payment/cancel`
+      
+      // URL 파라미터 추가
+      const buyLink = new URL(baseBuyLink)
+      buyLink.searchParams.set('success_url', successUrl)
+      buyLink.searchParams.set('cancel_url', cancelUrl)
+      
+      console.log('🔄 Redirecting to LemonSqueezy checkout:', buyLink.toString())
       
       // LemonSqueezy Buy Link로 리다이렉트
-      window.open(buyLink, '_blank')
+      window.open(buyLink.toString(), '_blank')
       
     } catch (error) {
       console.error('❌ Payment error:', error)

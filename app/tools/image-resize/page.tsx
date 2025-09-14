@@ -13,6 +13,7 @@ import Head from 'next/head'
 import { trackFileConversion, trackProUpgrade } from '@/components/GoogleAnalytics'
 import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/lib/mobile'
 import { useProStatusContext } from '@/components/ProStatusProvider'
+import UsageCounter from '@/components/UsageCounter'
 
 export default function ImageResizePage() {
   const { isPro } = useProStatusContext()
@@ -57,6 +58,13 @@ export default function ImageResizePage() {
   const handleProcess = async () => {
     if (files.length === 0) {
       toast.error('파일을 선택해주세요.')
+      return
+    }
+
+    // 무료 사용자 제한 확인
+    if (!isPro && files.length > maxFiles) {
+      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+      setIsProModalOpen(true)
       return
     }
 
@@ -197,15 +205,15 @@ export default function ImageResizePage() {
             {/* Upload Area */}
             <div className="lg:col-span-2">
               <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
-                  <span>이미지 업로드</span>
-                  {!isPro && (
-                    <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
-                      <Lock className="w-3 h-3 mr-1" />
-                      최대 3개
-                    </span>
-                  )}
-                </h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <span>이미지 업로드</span>
+                <UsageCounter 
+                  current={files.length} 
+                  max={maxFiles} 
+                  isPro={isPro} 
+                  type="files" 
+                />
+              </h3>
                 <FileUpload
                   onFilesSelected={handleFilesSelected}
                   acceptedTypes={['image/jpeg', 'image/png', 'image/webp']}
@@ -216,7 +224,7 @@ export default function ImageResizePage() {
                 />
                 {!isPro && (
                   <p className="text-sm text-gray-500 mt-2">
-                    무료 버전은 최대 3개 파일만 처리할 수 있습니다. 
+                    무료 버전은 최대 {maxFiles}개 파일만 처리할 수 있습니다. 
                     <button 
                       onClick={() => setIsProModalOpen(true)}
                       className="text-primary-600 hover:text-primary-700 ml-1 underline"
@@ -288,7 +296,7 @@ export default function ImageResizePage() {
                 <div className="mt-6 space-y-3">
                   <Button 
                     onClick={handleProcess}
-                    disabled={files.length === 0 || isProcessing}
+                    disabled={files.length === 0 || isProcessing || (!isPro && files.length > maxFiles)}
                     className="w-full"
                   >
                     {isProcessing ? (

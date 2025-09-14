@@ -11,6 +11,7 @@ import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
+import UsageCounter from '@/components/UsageCounter'
 
 interface SubtitleEntry {
   id: number
@@ -162,12 +163,12 @@ export default function SrtEditorPage() {
                   <Upload className="w-5 h-5 mr-2" />
                   파일 업로드
                 </div>
-                {!isPro && (
-                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
-                    <Lock className="w-3 h-3 mr-1" />
-                    최대 50개
-                  </span>
-                )}
+                <UsageCounter 
+                  current={subtitles.length} 
+                  max={maxSubtitleEntries} 
+                  isPro={isPro} 
+                  type="entries" 
+                />
               </h3>
               <FileUpload
                 onFilesSelected={handleFileSelected}

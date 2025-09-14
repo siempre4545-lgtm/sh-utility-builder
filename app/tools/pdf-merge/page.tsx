@@ -12,6 +12,7 @@ import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
+import UsageCounter from '@/components/UsageCounter'
 
 export default function PdfMergePage() {
   const { isPro } = useProStatusContext()
@@ -49,6 +50,13 @@ export default function PdfMergePage() {
   const handleProcess = async () => {
     if (files.length === 0) {
       toast.error('PDF 파일을 선택해주세요.')
+      return
+    }
+
+    // 무료 사용자 제한 확인
+    if (!isPro && files.length > maxFiles) {
+      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+      setIsProModalOpen(true)
       return
     }
 
@@ -137,12 +145,12 @@ export default function PdfMergePage() {
             <div className="card">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
                 <span>PDF 파일 업로드</span>
-                {!isPro && (
-                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
-                    <Lock className="w-3 h-3 mr-1" />
-                    최대 3개
-                  </span>
-                )}
+                <UsageCounter 
+                  current={files.length} 
+                  max={maxFiles} 
+                  isPro={isPro} 
+                  type="files" 
+                />
               </h3>
               <FileUpload
                 onFilesSelected={handleFilesSelected}

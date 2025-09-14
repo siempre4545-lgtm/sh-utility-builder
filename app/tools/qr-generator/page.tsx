@@ -10,6 +10,7 @@ import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
+import UsageCounter from '@/components/UsageCounter'
 
 export default function QrGeneratorPage() {
   const { isPro } = useProStatusContext()
@@ -136,12 +137,12 @@ export default function QrGeneratorPage() {
             <div className="card">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
                 <span>QR 코드 설정</span>
-                {!isPro && (
-                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
-                    <Lock className="w-3 h-3 mr-1" />
-                    {remainingGenerations}개 남음
-                  </span>
-                )}
+                <UsageCounter 
+                  current={dailyCount} 
+                  max={maxDailyGenerations} 
+                  isPro={isPro} 
+                  type="generations" 
+                />
               </h3>
               
               <div className="space-y-6">

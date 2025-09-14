@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { 
   Settings, 
@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 
-export default function SubscriptionManagePage() {
+function SubscriptionManageContent() {
   const searchParams = useSearchParams()
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'cancelled' | 'expired' | 'loading'>('loading')
   const [subscriptionData, setSubscriptionData] = useState<any>(null)
@@ -234,5 +234,20 @@ export default function SubscriptionManagePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SubscriptionManagePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin text-primary-600 mx-auto mb-4" />
+          <p className="text-gray-600">구독 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    }>
+      <SubscriptionManageContent />
+    </Suspense>
   )
 }

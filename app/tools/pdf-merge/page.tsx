@@ -14,6 +14,7 @@ import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
 import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
+import { useEffect } from 'react'
 
 export default function PdfMergePage() {
   const { isPro } = useProStatusContext()
@@ -22,8 +23,15 @@ export default function PdfMergePage() {
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
-  const conversionCount = getConversionCount('pdf-merge')
-  const remainingConversions = maxFiles - conversionCount
+  const [conversionCount, setConversionCount] = useState(0)
+  const [remainingConversions, setRemainingConversions] = useState(maxFiles)
+
+  // 클라이언트에서 변환 카운트 로드
+  useEffect(() => {
+    const count = getConversionCount('pdf-merge')
+    setConversionCount(count)
+    setRemainingConversions(maxFiles - count)
+  }, [maxFiles])
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
@@ -98,6 +106,9 @@ export default function PdfMergePage() {
       // 변환 카운트 증가
       if (!isPro) {
         incrementConversionCount('pdf-merge', 1)
+        const newCount = getConversionCount('pdf-merge')
+        setConversionCount(newCount)
+        setRemainingConversions(maxFiles - newCount)
       }
 
       toast.success('PDF 병합이 완료되었습니다!')

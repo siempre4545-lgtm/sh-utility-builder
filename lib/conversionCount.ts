@@ -13,6 +13,11 @@ function getTodayString(): string {
 
 // 마지막 리셋 날짜 확인 및 필요시 카운트 초기화
 function checkAndResetIfNeeded(): ConversionCount {
+  // SSR 환경에서는 빈 객체 반환
+  if (typeof window === 'undefined') {
+    return {}
+  }
+  
   const today = getTodayString()
   const lastReset = localStorage.getItem(LAST_RESET_KEY)
   
@@ -36,6 +41,11 @@ export function getConversionCount(toolName: string): number {
 
 // 특정 도구의 변환 카운트 증가
 export function incrementConversionCount(toolName: string, amount: number = 1): void {
+  // SSR 환경에서는 아무것도 하지 않음
+  if (typeof window === 'undefined') {
+    return
+  }
+  
   const counts = checkAndResetIfNeeded()
   counts[toolName] = (counts[toolName] || 0) + amount
   localStorage.setItem(CONVERSION_COUNT_KEY, JSON.stringify(counts))
@@ -43,6 +53,11 @@ export function incrementConversionCount(toolName: string, amount: number = 1): 
 
 // 특정 도구의 변환 카운트 설정
 export function setConversionCount(toolName: string, count: number): void {
+  // SSR 환경에서는 아무것도 하지 않음
+  if (typeof window === 'undefined') {
+    return
+  }
+  
   const counts = checkAndResetIfNeeded()
   counts[toolName] = count
   localStorage.setItem(CONVERSION_COUNT_KEY, JSON.stringify(counts))
@@ -50,12 +65,22 @@ export function setConversionCount(toolName: string, count: number): void {
 
 // 모든 변환 카운트 초기화 (테스트용)
 export function resetAllConversionCounts(): void {
+  // SSR 환경에서는 아무것도 하지 않음
+  if (typeof window === 'undefined') {
+    return
+  }
+  
   localStorage.removeItem(CONVERSION_COUNT_KEY)
   localStorage.removeItem(LAST_RESET_KEY)
 }
 
 // 특정 도구의 변환 카운트 초기화
 export function resetConversionCount(toolName: string): void {
+  // SSR 환경에서는 아무것도 하지 않음
+  if (typeof window === 'undefined') {
+    return
+  }
+  
   const counts = checkAndResetIfNeeded()
   delete counts[toolName]
   localStorage.setItem(CONVERSION_COUNT_KEY, JSON.stringify(counts))

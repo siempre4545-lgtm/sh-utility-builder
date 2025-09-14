@@ -15,6 +15,7 @@ import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/l
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
 import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
+import { useEffect } from 'react'
 
 export default function ImageResizePage() {
   const { isPro } = useProStatusContext()
@@ -29,8 +30,15 @@ export default function ImageResizePage() {
   const [isDownloading, setIsDownloading] = useState(false)
   // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
-  const conversionCount = getConversionCount('image-resize')
-  const remainingConversions = maxFiles - conversionCount
+  const [conversionCount, setConversionCount] = useState(0)
+  const [remainingConversions, setRemainingConversions] = useState(maxFiles)
+
+  // 클라이언트에서 변환 카운트 로드
+  useEffect(() => {
+    const count = getConversionCount('image-resize')
+    setConversionCount(count)
+    setRemainingConversions(maxFiles - count)
+  }, [maxFiles])
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
@@ -153,6 +161,9 @@ export default function ImageResizePage() {
       // 변환 카운트 증가
       if (!isPro) {
         incrementConversionCount('image-resize', files.length)
+        const newCount = getConversionCount('image-resize')
+        setConversionCount(newCount)
+        setRemainingConversions(maxFiles - newCount)
       }
       
       // 성공 이벤트 추적

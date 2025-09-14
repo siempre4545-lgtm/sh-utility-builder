@@ -16,6 +16,7 @@ import { handleApiDownload } from '@/lib/download'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
 import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
+import { useEffect } from 'react'
 
 export default function WebpToJpgPage() {
   const { isPro } = useProStatusContext()
@@ -27,8 +28,15 @@ export default function WebpToJpgPage() {
   const [isDownloading, setIsDownloading] = useState(false)
   // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
-  const conversionCount = getConversionCount('webp-to-jpg')
-  const remainingConversions = maxFiles - conversionCount
+  const [conversionCount, setConversionCount] = useState(0)
+  const [remainingConversions, setRemainingConversions] = useState(maxFiles)
+
+  // 클라이언트에서 변환 카운트 로드
+  useEffect(() => {
+    const count = getConversionCount('webp-to-jpg')
+    setConversionCount(count)
+    setRemainingConversions(maxFiles - count)
+  }, [maxFiles])
 
   const handleFilesSelected = (selectedFiles: File[]) => {
     setFiles(selectedFiles)
@@ -171,6 +179,9 @@ export default function WebpToJpgPage() {
         // 변환 카운트 증가
         if (!isPro) {
           incrementConversionCount('webp-to-jpg', files.length)
+          const newCount = getConversionCount('webp-to-jpg')
+          setConversionCount(newCount)
+          setRemainingConversions(maxFiles - newCount)
         }
         
         // GA4 이벤트 추적 (데스크톱)

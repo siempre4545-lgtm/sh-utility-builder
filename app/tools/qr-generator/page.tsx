@@ -12,6 +12,7 @@ import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
 import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
+import { useEffect, useState } from 'react'
 
 export default function QrGeneratorPage() {
   const { isPro } = useProStatusContext()
@@ -24,8 +25,15 @@ export default function QrGeneratorPage() {
   const [copied, setCopied] = useState(false)
   // 무료 사용자 제한: 하루 최대 5개 QR 코드 생성
   const maxDailyGenerations = isPro ? Infinity : 5
-  const dailyCount = getConversionCount('qr-generator')
-  const remainingGenerations = maxDailyGenerations - dailyCount
+  const [dailyCount, setDailyCount] = useState(0)
+  const [remainingGenerations, setRemainingGenerations] = useState(maxDailyGenerations)
+
+  // 클라이언트에서 변환 카운트 로드
+  useEffect(() => {
+    const count = getConversionCount('qr-generator')
+    setDailyCount(count)
+    setRemainingGenerations(maxDailyGenerations - count)
+  }, [maxDailyGenerations])
 
   const handleGenerate = async () => {
     if (!text.trim()) {
@@ -62,6 +70,9 @@ export default function QrGeneratorPage() {
       // 무료 사용자 카운트 증가
       if (!isPro) {
         incrementConversionCount('qr-generator', 1)
+        const newCount = getConversionCount('qr-generator')
+        setDailyCount(newCount)
+        setRemainingGenerations(maxDailyGenerations - newCount)
       }
       
       toast.success('QR 코드가 생성되었습니다!')

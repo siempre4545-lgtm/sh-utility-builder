@@ -6,18 +6,28 @@ import { useState } from 'react'
 export const dynamic = 'force-dynamic'
 import { isMobile, downloadFile } from '@/lib/mobile'
 import { Button } from '@/components/ui/Button'
-import { FileText, Download, ArrowUpDown, Loader2 } from 'lucide-react'
+import { FileText, Download, ArrowUpDown, Loader2, Lock } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
+import { useProStatusContext } from '@/components/ProStatusProvider'
 
 export default function PdfMergePage() {
+  const { isPro } = useProStatusContext()
   const [files, setFiles] = useState<File[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
 
+  // 무료 사용자 제한: 최대 3개 파일
+  const maxFiles = isPro ? Infinity : 3
+
   const handleFilesSelected = (selectedFiles: File[]) => {
+    if (!isPro && selectedFiles.length > maxFiles) {
+      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+      setIsProModalOpen(true)
+      return
+    }
     setFiles(selectedFiles)
   }
 
@@ -125,13 +135,33 @@ export default function PdfMergePage() {
           {/* Upload Area */}
           <div className="lg:col-span-2">
             <div className="card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <span>PDF 파일 업로드</span>
+                {!isPro && (
+                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
+                    <Lock className="w-3 h-3 mr-1" />
+                    최대 3개
+                  </span>
+                )}
+              </h3>
               <FileUpload
                 onFilesSelected={handleFilesSelected}
                 acceptedTypes={['application/pdf']}
                 maxSize={100}
-                maxFiles={10}
+                maxFiles={maxFiles}
                 disabled={isProcessing}
               />
+              {!isPro && (
+                <p className="text-sm text-gray-500 mt-2">
+                  무료 버전은 최대 3개 파일만 처리할 수 있습니다. 
+                  <button 
+                    onClick={() => setIsProModalOpen(true)}
+                    className="text-primary-600 hover:text-primary-700 ml-1 underline"
+                  >
+                    Pro로 업그레이드
+                  </button>
+                </p>
+              )}
             </div>
 
             {/* File List */}

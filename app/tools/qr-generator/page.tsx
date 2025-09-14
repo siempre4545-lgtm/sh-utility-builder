@@ -5,12 +5,14 @@ import { useState } from 'react'
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/Button'
-import { QrCode, Download, Loader2, Copy, Check } from 'lucide-react'
+import { QrCode, Download, Loader2, Copy, Check, Lock } from 'lucide-react'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
+import { useProStatusContext } from '@/components/ProStatusProvider'
 
 export default function QrGeneratorPage() {
+  const { isPro } = useProStatusContext()
   const [text, setText] = useState('')
   const [size, setSize] = useState(256)
   const [format, setFormat] = useState('png')
@@ -18,10 +20,22 @@ export default function QrGeneratorPage() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [dailyCount, setDailyCount] = useState(0)
+
+  // 무료 사용자 제한: 하루 최대 5개 QR 코드 생성
+  const maxDailyGenerations = isPro ? Infinity : 5
+  const remainingGenerations = maxDailyGenerations - dailyCount
 
   const handleGenerate = async () => {
     if (!text.trim()) {
       toast.error('QR 코드로 변환할 텍스트를 입력해주세요.')
+      return
+    }
+
+    // 무료 사용자 제한 확인
+    if (!isPro && dailyCount >= maxDailyGenerations) {
+      toast.error(`무료 버전은 하루에 최대 ${maxDailyGenerations}개 QR 코드만 생성할 수 있습니다. Pro로 업그레이드하세요.`)
+      setIsProModalOpen(true)
       return
     }
 
@@ -43,6 +57,12 @@ export default function QrGeneratorPage() {
 
       const result = await response.json()
       setQrCodeData(result.data)
+      
+      // 무료 사용자 카운트 증가
+      if (!isPro) {
+        setDailyCount(prev => prev + 1)
+      }
+      
       toast.success('QR 코드가 생성되었습니다!')
     } catch (error) {
       console.error('QR 코드 생성 오류:', error)
@@ -114,8 +134,14 @@ export default function QrGeneratorPage() {
           {/* Input Area */}
           <div className="lg:col-span-2">
             <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                QR 코드 설정
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <span>QR 코드 설정</span>
+                {!isPro && (
+                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
+                    <Lock className="w-3 h-3 mr-1" />
+                    {remainingGenerations}개 남음
+                  </span>
+                )}
               </h3>
               
               <div className="space-y-6">
@@ -165,7 +191,7 @@ export default function QrGeneratorPage() {
 
                 <Button 
                   onClick={handleGenerate}
-                  disabled={!text.trim() || isGenerating}
+                  disabled={!text.trim() || isGenerating || (!isPro && dailyCount >= maxDailyGenerations)}
                   className="w-full"
                 >
                   {isGenerating ? (
@@ -180,6 +206,18 @@ export default function QrGeneratorPage() {
                     </>
                   )}
                 </Button>
+                
+                {!isPro && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    무료 버전은 하루에 최대 {maxDailyGenerations}개 QR 코드만 생성할 수 있습니다. 
+                    <button 
+                      onClick={() => setIsProModalOpen(true)}
+                      className="text-primary-600 hover:text-primary-700 ml-1 underline"
+                    >
+                      Pro로 업그레이드
+                    </button>
+                  </p>
+                )}
               </div>
             </div>
 

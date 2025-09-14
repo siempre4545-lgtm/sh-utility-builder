@@ -6,13 +6,15 @@ import { useState } from 'react'
 export const dynamic = 'force-dynamic'
 import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/lib/mobile'
 import { Button } from '@/components/ui/Button'
-import { Download, Smartphone, Camera, Loader2, AlertTriangle, ExternalLink } from 'lucide-react'
+import { Download, Smartphone, Camera, Loader2, AlertTriangle, ExternalLink, Lock } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
+import { useProStatusContext } from '@/components/ProStatusProvider'
 
 export default function HeicToJpgPage() {
+  const { isPro } = useProStatusContext()
   const [files, setFiles] = useState<File[]>([])
   const [quality, setQuality] = useState(90)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -21,7 +23,15 @@ export default function HeicToJpgPage() {
   const [convertedFiles, setConvertedFiles] = useState<File[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
 
+  // 무료 사용자 제한: 최대 3개 파일
+  const maxFiles = isPro ? Infinity : 3
+
   const handleFilesSelected = (selectedFiles: File[]) => {
+    if (!isPro && selectedFiles.length > maxFiles) {
+      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+      setIsProModalOpen(true)
+      return
+    }
     setFiles(selectedFiles)
     setConvertedFiles([]) // 새 파일 선택 시 변환된 파일 초기화
   }
@@ -159,13 +169,33 @@ export default function HeicToJpgPage() {
           {/* Upload Area */}
           <div className="lg:col-span-2">
             <div className="card">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <span>HEIC 파일 업로드</span>
+                {!isPro && (
+                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
+                    <Lock className="w-3 h-3 mr-1" />
+                    최대 3개
+                  </span>
+                )}
+              </h3>
               <FileUpload
                 onFilesSelected={handleFilesSelected}
                 acceptedTypes={['image/heic', 'image/heif']}
                 maxSize={50}
-                maxFiles={10}
+                maxFiles={maxFiles}
                 disabled={isProcessing}
               />
+              {!isPro && (
+                <p className="text-sm text-gray-500 mt-2">
+                  무료 버전은 최대 3개 파일만 처리할 수 있습니다. 
+                  <button 
+                    onClick={() => setIsProModalOpen(true)}
+                    className="text-primary-600 hover:text-primary-700 ml-1 underline"
+                  >
+                    Pro로 업그레이드
+                  </button>
+                </p>
+              )}
             </div>
 
             {/* Conversion Info */}

@@ -5,11 +5,12 @@ import { useState } from 'react'
 // 캐싱 비활성화 - 실시간 업데이트 보장
 export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/Button'
-import { Video, Download, Upload, Loader2, Clock, Type } from 'lucide-react'
+import { Video, Download, Upload, Loader2, Clock, Type, Lock } from 'lucide-react'
 import FileUpload from '@/components/FileUpload'
 import ProModal from '@/components/ProModal'
 import { toast } from 'sonner'
 import Head from 'next/head'
+import { useProStatusContext } from '@/components/ProStatusProvider'
 
 interface SubtitleEntry {
   id: number
@@ -19,10 +20,14 @@ interface SubtitleEntry {
 }
 
 export default function SrtEditorPage() {
+  const { isPro } = useProStatusContext()
   const [file, setFile] = useState<File | null>(null)
   const [subtitles, setSubtitles] = useState<SubtitleEntry[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+
+  // 무료 사용자 제한: 최대 50개 자막 항목
+  const maxSubtitleEntries = isPro ? Infinity : 50
 
   const handleFileSelected = (files: File[]) => {
     if (files.length > 0) {
@@ -55,6 +60,13 @@ export default function SrtEditorPage() {
           }
         }
       })
+      
+      // 무료 사용자 제한 확인
+      if (!isPro && entries.length > maxSubtitleEntries) {
+        toast.error(`무료 버전은 최대 ${maxSubtitleEntries}개 자막 항목만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+        setIsProModalOpen(true)
+        return
+      }
       
       setSubtitles(entries)
       toast.success('SRT 파일이 로드되었습니다!')
@@ -145,9 +157,17 @@ export default function SrtEditorPage() {
           {/* Upload Area */}
           <div className="lg:col-span-1">
             <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Upload className="w-5 h-5 mr-2" />
-                파일 업로드
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <Upload className="w-5 h-5 mr-2" />
+                  파일 업로드
+                </div>
+                {!isPro && (
+                  <span className="text-sm text-orange-600 bg-orange-100 px-2 py-1 rounded-full flex items-center">
+                    <Lock className="w-3 h-3 mr-1" />
+                    최대 50개
+                  </span>
+                )}
               </h3>
               <FileUpload
                 onFilesSelected={handleFileSelected}
@@ -156,6 +176,17 @@ export default function SrtEditorPage() {
                 maxFiles={1}
                 disabled={isProcessing}
               />
+              {!isPro && (
+                <p className="text-sm text-gray-500 mt-2">
+                  무료 버전은 최대 {maxSubtitleEntries}개 자막 항목만 처리할 수 있습니다. 
+                  <button 
+                    onClick={() => setIsProModalOpen(true)}
+                    className="text-primary-600 hover:text-primary-700 ml-1 underline"
+                  >
+                    Pro로 업그레이드
+                  </button>
+                </p>
+              )}
             </div>
 
             {/* Tools */}

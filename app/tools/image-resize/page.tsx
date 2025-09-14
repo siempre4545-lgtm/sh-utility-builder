@@ -26,17 +26,13 @@ export default function ImageResizePage() {
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [resizedFiles, setResizedFiles] = useState<File[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
+  const [conversionCount, setConversionCount] = useState(0)
 
-  // 무료 사용자 제한: 최대 3개 파일
+  // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
-  const isFileLimitExceeded = files.length > maxFiles
+  const remainingConversions = maxFiles - conversionCount
 
   const handleFilesSelected = (selectedFiles: File[]) => {
-    if (!isPro && selectedFiles.length > maxFiles) {
-      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
-      setIsProModalOpen(true)
-      return
-    }
     setFiles(selectedFiles)
     setResizedFiles([]) // 새 파일 선택 시 리사이즈된 파일 초기화
   }
@@ -61,9 +57,9 @@ export default function ImageResizePage() {
       return
     }
 
-    // 무료 사용자 제한 확인
-    if (!isPro && files.length > maxFiles) {
-      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+    // 무료 사용자 변환 제한 확인
+    if (!isPro && remainingConversions <= 0) {
+      toast.error(`무료 버전은 하루에 최대 ${maxFiles}개 파일만 변환할 수 있습니다. Pro로 업그레이드하세요.`)
       setIsProModalOpen(true)
       return
     }
@@ -154,6 +150,11 @@ export default function ImageResizePage() {
         toast.success('리사이즈된 이미지들이 ZIP 파일로 다운로드되었습니다.')
       }
       
+      // 변환 카운트 증가
+      if (!isPro) {
+        setConversionCount(prev => prev + files.length)
+      }
+      
       // 성공 이벤트 추적
       const processingTime = Date.now() - startTime
       trackFileConversion('image-resize', true, processingTime, blob.size)
@@ -208,7 +209,7 @@ export default function ImageResizePage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
                 <span>이미지 업로드</span>
                 <UsageCounter 
-                  current={files.length} 
+                  remaining={remainingConversions} 
                   max={maxFiles} 
                   isPro={isPro} 
                   type="files" 
@@ -224,7 +225,7 @@ export default function ImageResizePage() {
                 />
                 {!isPro && (
                   <p className="text-sm text-gray-500 mt-2">
-                    무료 버전은 최대 {maxFiles}개 파일만 처리할 수 있습니다. 
+                    무료 버전은 하루에 최대 {maxFiles}개 파일만 변환할 수 있습니다. 
                     <button 
                       onClick={() => setIsProModalOpen(true)}
                       className="text-primary-600 hover:text-primary-700 ml-1 underline"
@@ -296,7 +297,7 @@ export default function ImageResizePage() {
                 <div className="mt-6 space-y-3">
                   <Button 
                     onClick={handleProcess}
-                    disabled={files.length === 0 || isProcessing || (!isPro && files.length > maxFiles)}
+                    disabled={files.length === 0 || isProcessing || (!isPro && remainingConversions <= 0)}
                     className="w-full"
                   >
                     {isProcessing ? (

@@ -26,9 +26,11 @@ export default function SrtEditorPage() {
   const [subtitles, setSubtitles] = useState<SubtitleEntry[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+  const [conversionCount, setConversionCount] = useState(0)
 
-  // 무료 사용자 제한: 최대 50개 자막 항목
+  // 무료 사용자 제한: 최대 50개 자막 항목 변환
   const maxSubtitleEntries = isPro ? Infinity : 50
+  const remainingConversions = maxSubtitleEntries - conversionCount
 
   const handleFileSelected = (files: File[]) => {
     if (files.length > 0) {
@@ -63,12 +65,6 @@ export default function SrtEditorPage() {
       })
       
       // 무료 사용자 제한 확인
-      if (!isPro && entries.length > maxSubtitleEntries) {
-        toast.error(`무료 버전은 최대 ${maxSubtitleEntries}개 자막 항목만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
-        setIsProModalOpen(true)
-        return
-      }
-      
       setSubtitles(entries)
       toast.success('SRT 파일이 로드되었습니다!')
     } catch (error) {
@@ -102,6 +98,13 @@ export default function SrtEditorPage() {
   }
 
   const exportSrt = () => {
+    // 무료 사용자 변환 제한 확인
+    if (!isPro && remainingConversions <= 0) {
+      toast.error(`무료 버전은 하루에 최대 ${maxSubtitleEntries}개 자막 항목만 변환할 수 있습니다. Pro로 업그레이드하세요.`)
+      setIsProModalOpen(true)
+      return
+    }
+
     let srtContent = ''
     subtitles.forEach(subtitle => {
       srtContent += `${subtitle.id}\n`
@@ -118,6 +121,11 @@ export default function SrtEditorPage() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+    
+    // 변환 카운트 증가
+    if (!isPro) {
+      setConversionCount(prev => prev + subtitles.length)
+    }
     
     toast.success('SRT 파일이 다운로드되었습니다!')
   }
@@ -164,7 +172,7 @@ export default function SrtEditorPage() {
                   파일 업로드
                 </div>
                 <UsageCounter 
-                  current={subtitles.length} 
+                  remaining={remainingConversions} 
                   max={maxSubtitleEntries} 
                   isPro={isPro} 
                   type="entries" 

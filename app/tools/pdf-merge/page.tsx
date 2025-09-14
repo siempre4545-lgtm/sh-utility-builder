@@ -19,16 +19,13 @@ export default function PdfMergePage() {
   const [files, setFiles] = useState<File[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
+  const [conversionCount, setConversionCount] = useState(0)
 
-  // 무료 사용자 제한: 최대 3개 파일
+  // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
+  const remainingConversions = maxFiles - conversionCount
 
   const handleFilesSelected = (selectedFiles: File[]) => {
-    if (!isPro && selectedFiles.length > maxFiles) {
-      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
-      setIsProModalOpen(true)
-      return
-    }
     setFiles(selectedFiles)
   }
 
@@ -53,9 +50,9 @@ export default function PdfMergePage() {
       return
     }
 
-    // 무료 사용자 제한 확인
-    if (!isPro && files.length > maxFiles) {
-      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+    // 무료 사용자 변환 제한 확인
+    if (!isPro && remainingConversions <= 0) {
+      toast.error(`무료 버전은 하루에 최대 ${maxFiles}개 파일만 변환할 수 있습니다. Pro로 업그레이드하세요.`)
       setIsProModalOpen(true)
       return
     }
@@ -96,6 +93,11 @@ export default function PdfMergePage() {
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
         toast.success('PDF 파일이 병합되어 다운로드되었습니다.')
+      }
+
+      // 변환 카운트 증가
+      if (!isPro) {
+        setConversionCount(prev => prev + 1)
       }
 
       toast.success('PDF 병합이 완료되었습니다!')
@@ -146,7 +148,7 @@ export default function PdfMergePage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
                 <span>PDF 파일 업로드</span>
                 <UsageCounter 
-                  current={files.length} 
+                  remaining={remainingConversions} 
                   max={maxFiles} 
                   isPro={isPro} 
                   type="files" 

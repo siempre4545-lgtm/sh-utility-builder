@@ -3,27 +3,27 @@
 import { Lock, AlertTriangle } from 'lucide-react'
 
 interface UsageCounterProps {
-  current: number
+  remaining: number
   max: number
   isPro: boolean
   type: 'files' | 'generations' | 'entries'
 }
 
-export default function UsageCounter({ current, max, isPro, type }: UsageCounterProps) {
-  const isNearLimit = !isPro && current >= max * 0.8 // 80% 이상 사용 시
-  const isOverLimit = !isPro && current >= max
+export default function UsageCounter({ remaining, max, isPro, type }: UsageCounterProps) {
+  const isNearLimit = !isPro && remaining <= max * 0.2 // 20% 이하 남음
+  const isOverLimit = !isPro && remaining <= 0
   const isUnlimited = isPro || max === Infinity
 
   const getTypeText = () => {
     switch (type) {
       case 'files':
-        return '파일'
+        return '변환 가능'
       case 'generations':
-        return '생성'
+        return '생성 가능'
       case 'entries':
-        return '항목'
+        return '처리 가능'
       default:
-        return '사용'
+        return '사용 가능'
     }
   }
 
@@ -31,7 +31,7 @@ export default function UsageCounter({ current, max, isPro, type }: UsageCounter
     if (isUnlimited) {
       return '무제한'
     }
-    return `${current}/${max}`
+    return `${remaining}개 남음`
   }
 
   const getTextColor = () => {

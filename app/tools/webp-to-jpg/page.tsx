@@ -24,16 +24,13 @@ export default function WebpToJpgPage() {
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [convertedFiles, setConvertedFiles] = useState<File[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
+  const [conversionCount, setConversionCount] = useState(0)
 
-  // 무료 사용자 제한: 최대 3개 파일
+  // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
+  const remainingConversions = maxFiles - conversionCount
 
   const handleFilesSelected = (selectedFiles: File[]) => {
-    if (!isPro && selectedFiles.length > maxFiles) {
-      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
-      setIsProModalOpen(true)
-      return
-    }
     setFiles(selectedFiles)
     setConvertedFiles([]) // 새 파일 선택 시 변환된 파일 초기화
   }
@@ -58,9 +55,9 @@ export default function WebpToJpgPage() {
       return
     }
 
-    // 무료 사용자 제한 확인
-    if (!isPro && files.length > maxFiles) {
-      toast.error(`무료 버전은 최대 ${maxFiles}개 파일만 처리할 수 있습니다. Pro로 업그레이드하세요.`)
+    // 무료 사용자 변환 제한 확인
+    if (!isPro && remainingConversions <= 0) {
+      toast.error(`무료 버전은 하루에 최대 ${maxFiles}개 파일만 변환할 수 있습니다. Pro로 업그레이드하세요.`)
       setIsProModalOpen(true)
       return
     }
@@ -171,6 +168,11 @@ export default function WebpToJpgPage() {
           toast.success(`${files.length}개 WebP 파일이 JPG로 변환되어 ZIP 파일로 다운로드되었습니다!`)
         }
         
+        // 변환 카운트 증가
+        if (!isPro) {
+          setConversionCount(prev => prev + files.length)
+        }
+        
         // GA4 이벤트 추적 (데스크톱)
         trackFileConversion('webp-to-jpg', true, processingTime, blob.size)
         trackUserAction('file_download', 'webp-to-jpg', {
@@ -237,7 +239,7 @@ export default function WebpToJpgPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
                 <span>WebP 파일 업로드</span>
                 <UsageCounter 
-                  current={files.length} 
+                  remaining={remainingConversions} 
                   max={maxFiles} 
                   isPro={isPro} 
                   type="files" 

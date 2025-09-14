@@ -13,16 +13,16 @@ import { toast } from 'sonner'
 import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
+import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
 
 export default function PdfMergePage() {
   const { isPro } = useProStatusContext()
   const [files, setFiles] = useState<File[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
-  const [conversionCount, setConversionCount] = useState(0)
-
   // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
+  const conversionCount = getConversionCount('pdf-merge')
   const remainingConversions = maxFiles - conversionCount
 
   const handleFilesSelected = (selectedFiles: File[]) => {
@@ -97,7 +97,7 @@ export default function PdfMergePage() {
 
       // 변환 카운트 증가
       if (!isPro) {
-        setConversionCount(prev => prev + 1)
+        incrementConversionCount('pdf-merge', 1)
       }
 
       toast.success('PDF 병합이 완료되었습니다!')

@@ -14,6 +14,7 @@ import { trackFileConversion, trackProUpgrade } from '@/components/GoogleAnalyti
 import { isMobile, downloadFile, downloadMultipleFiles, previewImage } from '@/lib/mobile'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
+import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
 
 export default function ImageResizePage() {
   const { isPro } = useProStatusContext()
@@ -26,10 +27,9 @@ export default function ImageResizePage() {
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [resizedFiles, setResizedFiles] = useState<File[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
-  const [conversionCount, setConversionCount] = useState(0)
-
   // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
+  const conversionCount = getConversionCount('image-resize')
   const remainingConversions = maxFiles - conversionCount
 
   const handleFilesSelected = (selectedFiles: File[]) => {
@@ -152,7 +152,7 @@ export default function ImageResizePage() {
       
       // 변환 카운트 증가
       if (!isPro) {
-        setConversionCount(prev => prev + files.length)
+        incrementConversionCount('image-resize', files.length)
       }
       
       // 성공 이벤트 추적

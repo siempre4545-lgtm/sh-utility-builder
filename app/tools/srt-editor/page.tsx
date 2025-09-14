@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 import Head from 'next/head'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
+import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
 
 interface SubtitleEntry {
   id: number
@@ -26,10 +27,9 @@ export default function SrtEditorPage() {
   const [subtitles, setSubtitles] = useState<SubtitleEntry[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [isProModalOpen, setIsProModalOpen] = useState(false)
-  const [conversionCount, setConversionCount] = useState(0)
-
   // 무료 사용자 제한: 최대 50개 자막 항목 변환
   const maxSubtitleEntries = isPro ? Infinity : 50
+  const conversionCount = getConversionCount('srt-editor')
   const remainingConversions = maxSubtitleEntries - conversionCount
 
   const handleFileSelected = (files: File[]) => {
@@ -124,7 +124,7 @@ export default function SrtEditorPage() {
     
     // 변환 카운트 증가
     if (!isPro) {
-      setConversionCount(prev => prev + subtitles.length)
+      incrementConversionCount('srt-editor', subtitles.length)
     }
     
     toast.success('SRT 파일이 다운로드되었습니다!')

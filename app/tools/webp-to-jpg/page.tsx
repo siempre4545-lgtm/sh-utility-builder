@@ -15,6 +15,7 @@ import { trackFileConversion, trackUserAction } from '@/components/GoogleAnalyti
 import { handleApiDownload } from '@/lib/download'
 import { useProStatusContext } from '@/components/ProStatusProvider'
 import UsageCounter from '@/components/UsageCounter'
+import { getConversionCount, incrementConversionCount } from '@/lib/conversionCount'
 
 export default function WebpToJpgPage() {
   const { isPro } = useProStatusContext()
@@ -24,10 +25,9 @@ export default function WebpToJpgPage() {
   const [isProModalOpen, setIsProModalOpen] = useState(false)
   const [convertedFiles, setConvertedFiles] = useState<File[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
-  const [conversionCount, setConversionCount] = useState(0)
-
   // 무료 사용자 제한: 최대 3개 파일 변환
   const maxFiles = isPro ? Infinity : 3
+  const conversionCount = getConversionCount('webp-to-jpg')
   const remainingConversions = maxFiles - conversionCount
 
   const handleFilesSelected = (selectedFiles: File[]) => {
@@ -170,7 +170,7 @@ export default function WebpToJpgPage() {
         
         // 변환 카운트 증가
         if (!isPro) {
-          setConversionCount(prev => prev + files.length)
+          incrementConversionCount('webp-to-jpg', files.length)
         }
         
         // GA4 이벤트 추적 (데스크톱)

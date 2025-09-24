@@ -59,8 +59,8 @@ export default function UsStockCalculatorPage() {
   const [topValueStocks, setTopValueStocks] = useState<StockData[]>([])
   const [isLoadingStocks, setIsLoadingStocks] = useState(false)
   
-  // 무료 사용자 제한: 최대 5회 계산
-  const maxCalculations = isPro ? Infinity : 5
+  // 미국주식 계산기는 무제한 제공
+  const maxCalculations = Infinity
   const [conversionCount, setConversionCount] = useState(0)
   const [remainingConversions, setRemainingConversions] = useState(maxCalculations)
 
@@ -97,12 +97,7 @@ export default function UsStockCalculatorPage() {
 
   // 복리 계산
   const calculateInvestment = () => {
-    // 무료 사용자 변환 제한 확인
-    if (!isPro && remainingConversions <= 0) {
-      toast.error(`무료 버전은 하루에 최대 ${maxCalculations}회만 계산할 수 있습니다. Pro로 업그레이드하세요.`)
-      setIsProModalOpen(true)
-      return
-    }
+    // 미국주식 계산기는 무제한 제공
 
     setIsProcessing(true)
     
@@ -144,14 +139,6 @@ export default function UsStockCalculatorPage() {
       
       setResult(investmentResult)
       
-      // 변환 카운트 증가
-      if (!isPro) {
-        incrementConversionCount('us-stock-calculator', 1)
-        const newCount = getConversionCount('us-stock-calculator')
-        setConversionCount(newCount)
-        setRemainingConversions(maxCalculations - newCount)
-      }
-      
       toast.success('투자 계산이 완료되었습니다!')
     } catch (error) {
       toast.error('계산 중 오류가 발생했습니다.')
@@ -176,6 +163,14 @@ export default function UsStockCalculatorPage() {
 
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat('ko-KR').format(num)
+  }
+
+  const formatInputValue = (value: number) => {
+    return formatNumber(value)
+  }
+
+  const parseInputValue = (value: string) => {
+    return parseInt(value.replace(/,/g, '')) || 0
   }
 
   return (
@@ -214,17 +209,9 @@ export default function UsStockCalculatorPage() {
             {/* Input Section */}
             <div className="lg:col-span-1">
               <div className="card">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Calculator className="w-5 h-5 mr-2" />
-                    투자 정보 입력
-                  </div>
-                  <UsageCounter 
-                    remaining={remainingConversions} 
-                    max={maxCalculations} 
-                    isPro={isPro} 
-                    type="generations" 
-                  />
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <Calculator className="w-5 h-5 mr-2" />
+                  투자 정보 입력
                 </h3>
                 
                 <div className="space-y-4">
@@ -233,9 +220,9 @@ export default function UsStockCalculatorPage() {
                       초기 자본 (원)
                     </label>
                     <input
-                      type="number"
-                      value={initialCapital}
-                      onChange={(e) => setInitialCapital(Number(e.target.value))}
+                      type="text"
+                      value={formatInputValue(initialCapital)}
+                      onChange={(e) => setInitialCapital(parseInputValue(e.target.value))}
                       className="input-field"
                       placeholder="1,000,000"
                     />
@@ -246,9 +233,9 @@ export default function UsStockCalculatorPage() {
                       매월 매수금액 (원)
                     </label>
                     <input
-                      type="number"
-                      value={monthlyInvestment}
-                      onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
+                      type="text"
+                      value={formatInputValue(monthlyInvestment)}
+                      onChange={(e) => setMonthlyInvestment(parseInputValue(e.target.value))}
                       className="input-field"
                       placeholder="100,000"
                     />
@@ -303,9 +290,9 @@ export default function UsStockCalculatorPage() {
                       필요경비 (원)
                     </label>
                     <input
-                      type="number"
-                      value={transactionCosts}
-                      onChange={(e) => setTransactionCosts(Number(e.target.value))}
+                      type="text"
+                      value={formatInputValue(transactionCosts)}
+                      onChange={(e) => setTransactionCosts(parseInputValue(e.target.value))}
                       className="input-field"
                       placeholder="0"
                     />
@@ -332,35 +319,6 @@ export default function UsStockCalculatorPage() {
                     )}
                   </Button>
                 </div>
-                
-                {!isPro && (
-                  <p className="text-sm text-gray-500 mt-4">
-                    무료 버전은 하루에 최대 {maxCalculations}회만 계산할 수 있습니다. 
-                    <button 
-                      onClick={() => setIsProModalOpen(true)}
-                      className="text-primary-600 hover:text-primary-700 ml-1 underline"
-                    >
-                      Pro로 업그레이드
-                    </button>
-                  </p>
-                )}
-              </div>
-
-              {/* Pro Upgrade */}
-              <div className="card bg-gradient-to-r from-primary-50 to-secondary-50 border-primary-200 mt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Pro 업그레이드
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  무제한 계산, 고급 분석, 포트폴리오 추적
-                </p>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setIsProModalOpen(true)}
-                >
-                  Pro로 업그레이드
-                </Button>
               </div>
             </div>
 

@@ -48,7 +48,7 @@ export default function UsStockCalculatorPage() {
   const [investmentPeriod, setInvestmentPeriod] = useState(10) // 10년
   
   // 양도수익세 계산
-  const [capitalGainsTaxRate, setCapitalGainsTaxRate] = useState(22) // 22%
+  const capitalGainsTaxRate = 22 // 해외주식 양도소득세 고정 22%
   const [transactionCosts, setTransactionCosts] = useState(0) // 필요경비 (매매수수료 등)
   
   // 계산 결과
@@ -268,22 +268,6 @@ export default function UsStockCalculatorPage() {
                     />
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      양도수익세율 (%)
-                    </label>
-                    <input
-                      type="number"
-                      value={capitalGainsTaxRate}
-                      onChange={(e) => setCapitalGainsTaxRate(Number(e.target.value))}
-                      className="input-field"
-                      placeholder="22"
-                      step="0.1"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      해외주식 양도소득세 기본 22% (양도소득세 20% + 지방소득세 2%)
-                    </p>
-                  </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -298,6 +282,12 @@ export default function UsStockCalculatorPage() {
                     />
                     <p className="text-xs text-gray-500 mt-1">
                       매매수수료 등 (증권사별 상이하니 별도 계산 필요)
+                    </p>
+                  </div>
+                  
+                  <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                    <p className="text-sm text-blue-800">
+                      <strong>양도수익세율:</strong> 해외주식 양도소득세 22% (양도소득세 20% + 지방소득세 2%)
                     </p>
                   </div>
                   

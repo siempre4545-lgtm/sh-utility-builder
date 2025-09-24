@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Image, FileText, Download, Zap } from 'lucide-react'
+import { Image, FileText, Download, Zap, TrendingUp, QrCode } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const tools = [
@@ -40,6 +40,24 @@ const tools = [
     href: '/tools/webp-to-jpg',
     color: 'from-green-500 to-emerald-500',
     features: ['호환성 향상', '압축 최적화', '메타데이터 보존']
+  },
+  {
+    id: 'qr-generator',
+    title: 'QR 코드 생성',
+    description: '텍스트, URL, 연락처를 QR 코드로 변환',
+    icon: QrCode,
+    href: '/tools/qr-generator',
+    color: 'from-indigo-500 to-purple-500',
+    features: ['다양한 형식 지원', '커스텀 디자인', '고해상도 출력']
+  },
+  {
+    id: 'us-stock-calculator',
+    title: '미국주식 계산기',
+    description: '복리 투자 수익률과 양도수익세를 계산하세요',
+    icon: TrendingUp,
+    href: '/tools/us-stock-calculator',
+    color: 'from-emerald-500 to-teal-500',
+    features: ['복리 계산', '양도수익세 계산', '실시간 주식 데이터']
   }
 ]
 
@@ -49,14 +67,14 @@ export default function UtilityGrid() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            다양한 변환 도구
+            다양한 유틸리티 도구
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            이미지, PDF, 문서 변환을 위한 전문 도구들을 만나보세요
+            이미지, PDF, 문서 변환과 투자 계산을 위한 전문 도구들을 만나보세요
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {tools.map((tool, index) => (
             <motion.div
               key={tool.id}

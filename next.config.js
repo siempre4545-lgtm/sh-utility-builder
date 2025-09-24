@@ -19,8 +19,6 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
     // 성능 최적화 (critters 오류 방지)
     optimizeServerReact: true,
-    // 번들 분석
-    bundlePagesRouterDependencies: true,
   },
 
   // 웹팩 최적화

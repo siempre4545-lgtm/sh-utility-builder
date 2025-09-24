@@ -12,7 +12,7 @@ export async function zipFiles(
   
   const zipBuffer = await zip.generateAsync({ type: 'uint8array' });
   
-  return new Response(zipBuffer.buffer, {
+  return new Response(zipBuffer, {
     headers: {
       'Content-Type': 'application/zip',
       'Content-Disposition': `attachment; filename="${zipName}"`,

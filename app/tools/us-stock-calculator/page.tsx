@@ -31,6 +31,9 @@ interface InvestmentResult {
   monthlyInvestment: number
   capitalGainsTax: number
   afterTaxProfit: number
+  taxableIncome: number
+  basicDeduction: number
+  transactionCosts: number
 }
 
 export default function UsStockCalculatorPage() {
@@ -46,6 +49,7 @@ export default function UsStockCalculatorPage() {
   
   // 양도수익세 계산
   const [capitalGainsTaxRate, setCapitalGainsTaxRate] = useState(22) // 22%
+  const [transactionCosts, setTransactionCosts] = useState(0) // 필요경비 (매매수수료 등)
   
   // 계산 결과
   const [result, setResult] = useState<InvestmentResult | null>(null)
@@ -117,8 +121,12 @@ export default function UsStockCalculatorPage() {
       const profit = finalValue - totalInvestment
       const profitPercent = (profit / totalInvestment) * 100
       
-      // 양도수익세 계산 (해외주식 양도소득세 22%)
-      const capitalGainsTax = profit * (capitalGainsTaxRate / 100)
+      // 양도수익세 계산 (해외주식 양도소득세)
+      // 양도소득과세표준 = 양도소득금액 - 양도소득기본공제(250만원) - 필요경비(매매수수료 등)
+      // 양도소득세율 = 22% (양도소득세 20% + 지방소득세 2%)
+      const basicDeduction = 2500000 // 양도소득기본공제 250만원
+      const taxableIncome = Math.max(0, profit - basicDeduction - transactionCosts)
+      const capitalGainsTax = taxableIncome * (capitalGainsTaxRate / 100)
       const afterTaxProfit = profit - capitalGainsTax
       
       const investmentResult: InvestmentResult = {
@@ -128,7 +136,10 @@ export default function UsStockCalculatorPage() {
         profitPercent,
         monthlyInvestment: monthlyInvestment * totalMonths,
         capitalGainsTax,
-        afterTaxProfit
+        afterTaxProfit,
+        taxableIncome,
+        basicDeduction,
+        transactionCosts
       }
       
       setResult(investmentResult)
@@ -283,7 +294,23 @@ export default function UsStockCalculatorPage() {
                       step="0.1"
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      해외주식 양도소득세 기본 22%
+                      해외주식 양도소득세 기본 22% (양도소득세 20% + 지방소득세 2%)
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      필요경비 (원)
+                    </label>
+                    <input
+                      type="number"
+                      value={transactionCosts}
+                      onChange={(e) => setTransactionCosts(Number(e.target.value))}
+                      className="input-field"
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      매매수수료 등 (증권사별 상이하니 별도 계산 필요)
                     </p>
                   </div>
                   
@@ -373,7 +400,28 @@ export default function UsStockCalculatorPage() {
                       <DollarSign className="w-5 h-5 mr-2" />
                       양도수익세 계산
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600">양도소득금액</p>
+                        <p className="text-xl font-bold text-blue-600">{formatCurrency(result.profit)}</p>
+                      </div>
+                      <div className="bg-purple-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600">기본공제</p>
+                        <p className="text-xl font-bold text-purple-600">{formatCurrency(result.basicDeduction)}</p>
+                        <p className="text-xs text-gray-500">인당 250만원</p>
+                      </div>
+                      <div className="bg-orange-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600">필요경비</p>
+                        <p className="text-xl font-bold text-orange-600">{formatCurrency(result.transactionCosts)}</p>
+                        <p className="text-xs text-gray-500">매매수수료 등</p>
+                      </div>
+                      <div className="bg-indigo-50 p-4 rounded-lg">
+                        <p className="text-sm text-gray-600">과세표준</p>
+                        <p className="text-xl font-bold text-indigo-600">{formatCurrency(result.taxableIncome)}</p>
+                        <p className="text-xs text-gray-500">양도소득금액 - 기본공제 - 필요경비</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                       <div className="bg-red-50 p-4 rounded-lg">
                         <p className="text-sm text-gray-600">양도수익세</p>
                         <p className="text-xl font-bold text-red-600">{formatCurrency(result.capitalGainsTax)}</p>
@@ -386,6 +434,36 @@ export default function UsStockCalculatorPage() {
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <p className="text-sm text-gray-600">월별 투자금액</p>
                         <p className="text-xl font-bold text-gray-900">{formatCurrency(result.monthlyInvestment)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tax Notice */}
+                  <div className="card bg-yellow-50 border-yellow-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Lock className="w-5 h-5 mr-2" />
+                      신고납부 유의사항
+                    </h3>
+                    <div className="space-y-3 text-sm text-gray-700">
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">신고납부기간</p>
+                        <p>매년 1월1일 ~ 12월31일 기간 내 매도(결제일 기준)한 내역에 대해 다음해 신고기한(5월1일~5월31일)내 자진신고납부</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">가산세 부과</p>
+                        <p>기한 내 미신고, 미납부 시 가산세 부과</p>
+                        <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
+                          <li>신고불성실 가산세: 과소신고시 10%, 무신고시 20%</li>
+                          <li>납부불성실 가산세: 미(과소)납부세액×미납일수×0.03%</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">신고방법</p>
+                        <p>주소지 관할 세무서 신고 또는 홈택스서비스(www.hometax.go.kr) 전자신고</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">납부장소</p>
+                        <p>양도소득세: 가까운 은행 또는 우체국 / 지방소득세: 주소지 시∙군∙구 계약 수납대행은행 및 우체국</p>
                       </div>
                     </div>
                   </div>

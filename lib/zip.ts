@@ -10,7 +10,7 @@ export async function zipFiles(
     zip.file(file.name, file.data);
   });
   
-  const zipBuffer = await zip.generateAsync({ type: 'uint8array' });
+  const zipBuffer = await zip.generateAsync({ type: 'arraybuffer' });
   
   return new Response(zipBuffer, {
     headers: {
